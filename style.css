@@ -11,3 +11,27 @@
     font-size:16px;
     text-align: center
 }
+ul{
+    list-style-type:none;
+}
+li{
+    float:left;
+    }
+li a{
+    display: block;
+    margin:0;
+    padding:8px;
+    color:white;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 20px;
+    text-align:center;
+}
+li a:hover{
+    background-color:hotpink
+}
+li a:hover:not(.active){
+    background-color:rgb(0, 179, 255)
+}
+.active{
+    background-color:hotpink
+}
