@@ -3,7 +3,19 @@
     color:white;
     font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 20px;
-    text-align:center
+    text-align:center;
+}
+.bar{
+    color:white;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 20px;
+    text-align:center;
+    background-color:  rgb(53, 132, 244);
+    width:100%; 
+
+    list-style-type:none;
+    overflow:hidden;
+    position:fixed;
 }
 .text{
     color:white;
@@ -38,6 +50,10 @@ li a{
 
 .tab{
     border-right:2px solid white;
+    background-color: rgb(53, 132, 244);
+}
+.tab a{
+    background-color:rgb(53, 132, 244);
 }
 .tab:last-child{
     border-right: none
