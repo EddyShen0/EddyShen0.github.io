@@ -68,7 +68,8 @@ input.placeholder = "What do you want to ask?"
                                 {"analysis": "string"}
                                 and no other text other than the JSON array.
                                  Make sure the advice is about a paragraph long,
-                                 get as specific as possible and provide possible situations,
+                                 get as specific as possible,
+                                 provide imaginary situations as examples to further explain when necessary,
                                  and its okay to offer negative analysis if necessary`
                         },
                         {
