@@ -3,21 +3,45 @@
 <head>
   <link rel="stylesheet" href="style.css">
   <title>Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="start">
-  <h1>Tarot Test</h1>
-  <p>welcome, Oscar Chen</p>
-  <input class="input" id = "input"></input>
-  <button onclick="start()">Generate Tarot Reading</button>
-  <div id = "main">
 
+  <div class="start" id = "start">
+
+  <h1 style = "font-weight: bold; color: rgb(255, 0, 119); font-size: 32px; scale: 1 1 ; letter-spacing:-4px;">
+    THE<span style = "font-size: 10px;"> </span>·<span style = "font-size: 10px;"> </span>TAROT
+  </h1>
+  <div id = "cardShow" class = "cardShow">
   </div>
+  <div id = "center" class = "center">
+  </div>
+  <div id = "question" class = "question">
+    <p style="margin-top: 180px">welcome, human</p>
+    <input class="input" id = "input"></input>
+    <button onclick="chooseStart()">Generate Tarot Reading</button>
+  </div>
+  <div id = "main" class = "main">
+    <div id = "cardExhibit" class = "cardExhibit">
+      <div id = "name" class = "name"></div>
+      <div id = "direction" class = "direction"> </div>
+      <div id = "meaning" class = "meaning"></div>
+      <div id = "implication" class = "implication"></div>
+      <div id = "advice" class = "advice"></div>
+    </div>
+  </div>
+  <div id = "analysis" class = "analysis">
+    OVERVIEW
+    <div id = "analysisContent" class = "analysisContent"></div>
+  </div>
+  <div id = "guide" class = "guide"></div>
   <pre id="output"></pre>
 </div>
+
 
   <script src="script.js"></script>
 </body>
 </html>
-
 

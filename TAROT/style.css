@@ -1,3 +1,25 @@
+.main{
+    display: flex;
+    width:100px;
+    height: 100px;
+    transform: translate(0px,-20px);
+    align-items: center;
+}
+
+.cardExhibit{
+position: absolute;
+transition: transform 2s, opacity 1s, width 2s;
+width: 100px;
+height: auto;
+opacity: 0;
+transform: translate(-40vw,0px)
+}
+
+.canvas{
+    background-color: rgba(25, 0, 248, 0);
+    position:absolute;
+}
+
 .input{
     width:500px;
     text-align: center;
@@ -9,4 +31,210 @@
     display:flex;
     flex-direction: column;
     align-items: center;
+}
+
+.eff{
+    position:absolute;
+    transform: translate(0px, -2px);
+    z-index: 30;
+}
+
+.question{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(0px, 160px);
+    z-index: 0;
+    transition: transform 1s ease-in;
+}
+
+.card{
+    position: absolute;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 1.5s, rotate 2.5s, scale 1.5s;
+    rotate: 0deg;
+    /* transform: rotate(50deg) */
+}
+.cardShow{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 1.5s, scale 1.5s, rotate 2s;
+    transform: translate(0px,150px);
+    z-index: 50;
+    transform-origin: 0px 320px;
+}
+
+.cardUpright{
+    display: flex;
+    position:absolute;
+    overflow: hidden;
+    translate:0px 80px;
+    width: 100px;
+    height:145px;
+    background-color: rgb(76, 88, 255);
+    justify-content: center;
+    z-index:5;
+    transition: width 2s, rotate 2s, scale 1.5s;
+}
+.face{
+    display: flex;
+    position: absolute;
+    overflow: hidden;
+    background-color: aquamarine;
+    justify-content: center;
+    align-items: center;
+    width:100px;
+    height:145px;
+    z-index: 7;
+}
+
+.cardReverse{
+    display: flex;
+    position: absolute;
+    overflow: hidden;
+    background-color: aquamarine;
+    justify-content:center;
+    align-items:baseline;
+    transform: translate(0px,0px);
+    width:100px;
+    height:145px;
+    z-index: 7;
+}
+
+.cardBack{
+    position: absolute;
+    width: 100px;
+    height: 145px;
+    z-index:10;
+    box-sizing: border-box;
+    background-color: rgb(255, 0, 119);
+    background-color: rgb(255, 0, 119);
+    border: 5px solid rgb(255, 134, 170);
+    transition: scale 1.5s;
+    opacity:1
+}
+
+.cardTranslate{
+    position:absolute;
+    width: 100px;
+    height:145px;
+    background-color: rgb(76, 88, 255);
+    border-radius: 7px;
+    animation: cardTranslation 3s infinite;
+    z-index: 2;
+}
+
+@keyframes cardAnimation {
+    0% {rotate: -2deg}
+    50% {rotate: 2deg}
+    100% {rotate: -2deg}
+}
+
+@keyframes cardTranslation{
+    0% {transform: translate(0px, 0px)}
+    100% {transform:translate(100px, 240px)}
+}
+
+@keyframes cardFlip{
+    0% {transform: rotateY(180deg);}
+    50% {transform: rotateY(90deg);}
+    100% {transform: rotateY(0deg);}
+}
+
+@keyframes reRotate{
+    0% {rotate: 0deg}
+    100% {rotate: 0deg}
+}
+
+@keyframes rotation{
+    0%{rotate: 0deg}
+    50%{rotate: 180deg}
+    100%{rotate: 360deg}
+}
+
+.name{
+    font-weight: bold;
+    font-size: 40px;
+    margin-bottom:0px;
+    text-transform: uppercase;
+}
+
+.direction{
+    margin-bottom:15px;
+}
+
+.meaning{
+    margin-bottom:10px;
+    color: rgb(127, 127, 127);
+}
+
+.implication{
+    margin-bottom:10px;
+}
+
+.advice{
+    margin-bottom:10px;
+    
+}
+
+
+body{
+    margin: 0px;
+}
+
+
+#canvas { image-rendering: pixelated; }
+
+li{
+    list-style: none;
+}
+
+.center{
+    position: absolute;
+    width:90px;
+    height: 90px;
+    background-color: rgb(0, 255, 255);
+    opacity: 0;
+    transform: translate(0vw, 350px);
+    z-index: 0
+}
+
+.analysis{
+    position:absolute;
+    display: flex;
+    width: 400px;
+    height: 90px;
+    transform: translate(0vw, 500px);
+    transition: transform 2s, width 2s, opacity 1s;
+    opacity:0;
+    z-index:-10;
+    font-size: 40px;
+    font-weight: bold;
+    align-items: center;
+    flex-direction: column;
+}
+.analysisContent{
+    text-align: center;
+    margin-top:10px;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: normal;
+    margin-top: 10px;
+}
+.guide{
+    display: flex;
+    position:absolute;
+    justify-content: center;
+    align-items: center;
+    color: rgb(128, 128, 128);
+    text-align: center;
+    height:100px;
+    width:300px;
+    transform: translate(0px,80vh);
+    line-height: 24px;
+    transition: opacity 1s
 }
