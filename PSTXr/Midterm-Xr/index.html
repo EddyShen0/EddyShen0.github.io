@@ -1,3 +1,4 @@
+<!-- The portal portion code is written by claude ai -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,14 +34,12 @@ AFRAME.registerComponent('portal-system', {
       }
     };
 
-    // Render target
     this.renderTarget = new THREE.WebGLRenderTarget(
       canvas.width  || 1024,
       canvas.height || 1024,
       { format: THREE.RGBAFormat }
     );
 
-    // Portal camera — we'll override its projection matrix every frame
     const aspect = (canvas.width || window.innerWidth) /
                    (canvas.height || window.innerHeight);
     this.portalCamera = new THREE.PerspectiveCamera(75, aspect, 0.01, 1000);
@@ -52,7 +51,6 @@ AFRAME.registerComponent('portal-system', {
       this.portalCamera.aspect = w / h;
     });
 
-    // Other-world scene
     this.portalScene = new THREE.Scene();
     this.portalScene.background = new THREE.Color(0x111133);
 
@@ -65,22 +63,14 @@ AFRAME.registerComponent('portal-system', {
       this.portalScene.add(dir);
     }
 
-    // Cache portal geometry info (world space)
-    // Portal is an <a-plane> at position="0 1.5 -5", width=2, height=3
-    // We'll recompute corners each frame from the portal entity's world matrix
     this.portalEl     = portalEl;
-    this.portalWidth  = 2;   // must match <a-plane width>
-    this.portalHeight = 2;   // must match <a-plane height>
+    this.portalWidth  = 2 *0.116; 
+    this.portalHeight = 2*0.1; 
 
-    // The offset of the portal camera's eye in the other world.
-    // This is the "exit" position — where the camera sits when it's
-    // exactly centred on the portal. Adjust to frame your other world.
     this.exitPosition = new THREE.Vector3(0, 1.6, 2);
 
-    // Player ref
     this.playerEl = document.querySelector('#player');
 
-    // Reusable objects (avoid GC churn in tick)
     this._playerWorldPos  = new THREE.Vector3();
     this._portalWorldPos  = new THREE.Vector3();
     this._portalQuat      = new THREE.Quaternion();
@@ -103,14 +93,7 @@ AFRAME.registerComponent('portal-system', {
     });
   },
 
-  // Oblique frustum: given the player's eye in the OTHER world (camPos),
-  // and the portal rectangle corners (also in other-world space), compute
-  // a projection matrix whose near plane IS the portal rectangle.
-  //
-  // This is the standard technique used by Source engine, Unity portals, etc.
-  // Reference: http://www.terathink.com/oblique-near-plane-clipping/
   _buildObliqueFrustum: function (camPos, portalCenter, right, up, normal, hw, hh) {
-    // Portal corners in world (other-world) space
     const bl = portalCenter.clone()
       .addScaledVector(right, -hw)
       .addScaledVector(up,    -hh);
@@ -121,18 +104,13 @@ AFRAME.registerComponent('portal-system', {
       .addScaledVector(right, -hw)
       .addScaledVector(up,     hh);
 
-    // Vectors from eye to each corner
     const vbl = bl.clone().sub(camPos);
     const vbr = br.clone().sub(camPos);
     const vtl = tl.clone().sub(camPos);
 
-    // Near plane distance = distance from eye to portal plane along normal
-    // (signed — eye must be in front of the portal for this to work)
     const near = Math.abs(normal.dot(vbl));
-    if (near < 0.001) return null; // eye on or behind portal, skip
+    if (near < 0.001) return null;
 
-    // Build an off-centre / oblique projection matrix.
-    // left/right/top/bottom are the frustum edges projected onto the near plane.
     const left   = right.dot(vbl) * (this.portalCamera.near / near);
     const rightE = right.dot(vbr) * (this.portalCamera.near / near);
     const bottom = up.dot(vbl)    * (this.portalCamera.near / near);
@@ -150,37 +128,27 @@ AFRAME.registerComponent('portal-system', {
 
     const renderer = this.el.renderer;
 
-    // --- 1. Get player world position ---
     this.playerEl.object3D.getWorldPosition(this._playerWorldPos);
 
-    // --- 2. Get portal world transform ---
     this.portalEl.object3D.getWorldPosition(this._portalWorldPos);
     this.portalEl.object3D.getWorldQuaternion(this._portalQuat);
 
-    // Portal basis vectors in world space
     this._portalRight .set(1,0,0).applyQuaternion(this._portalQuat).normalize();
     this._portalUp    .set(0,1,0).applyQuaternion(this._portalQuat).normalize();
     this._portalNormal.set(0,0,1).applyQuaternion(this._portalQuat).normalize();
 
-    // --- 3. Compute player's lateral offset from portal center ---
     this._toPortal.subVectors(this._playerWorldPos, this._portalWorldPos);
     const lateralRight = this._toPortal.dot(this._portalRight);
     const lateralUp    = this._toPortal.dot(this._portalUp);
-    // depth along normal (how far in front of the portal the player is)
     const depth        = this._toPortal.dot(this._portalNormal);
 
-    // --- 4. Portal camera position in other-world space ---
-    // Mirror the lateral offset: player left of portal → camera left of exit.
-    // Also mirror the depth so the frustum near-plane lines up with the portal.
     this._camPos.copy(this.exitPosition)
       .addScaledVector(this._portalRight, lateralRight)
       .addScaledVector(this._portalUp,    lateralUp)
-      .addScaledVector(this._portalNormal, depth); // keep depth so near-plane math works
+      .addScaledVector(this._portalNormal, depth);
 
     this.portalCamera.position.copy(this._camPos);
 
-    // Portal camera always looks straight through (fixed orientation)
-    // It looks in the direction the portal normal points INTO the other world
     const lookDir = this._portalNormal.clone().negate();
     const m = new THREE.Matrix4().lookAt(
       this._camPos,
@@ -190,8 +158,6 @@ AFRAME.registerComponent('portal-system', {
     this.portalCamera.quaternion.setFromRotationMatrix(m);
     this.portalCamera.updateMatrixWorld(true);
 
-    // --- 5. Build oblique frustum so the portal rectangle IS the view frustum ---
-    // The portal center in other-world space is simply exitPosition (no lateral offset)
     const portalCenterOtherWorld = this.exitPosition.clone();
 
     const proj = this._buildObliqueFrustum(
@@ -208,11 +174,9 @@ AFRAME.registerComponent('portal-system', {
       this.portalCamera.projectionMatrix.copy(proj);
       this.portalCamera.projectionMatrixInverse.copy(proj).invert();
     } else {
-      // Fallback: standard perspective when eye is right on the portal
       this.portalCamera.updateProjectionMatrix();
     }
 
-    // --- 6. Render ---
     renderer.setRenderTarget(this.renderTarget);
     renderer.clear();
     renderer.render(this.portalScene, this.portalCamera);
@@ -229,70 +193,143 @@ AFRAME.registerComponent('portal-system', {
     shadow="type: pcfsoft"
   >
     <a-assets>
-      <img id="skyTexture" src="image1.jpeg">
-      <a-asset-item id="room" src="EddyShen_1217_Final.glb"></a-asset-item>
-      <a-asset-item id="computer" src="computer.glb"></a-asset-item>
       <a-asset-item id="avatar" src="avatar.glb"></a-asset-item>
-      <a-asset-item id="comp1" src="computer.obj"></a-asset-item>
-      <a-asset-item id="comp1-mtl" src="computer.mtl"></a-asset-item>
+      <a-asset-item id="room1" src="room.obj"></a-asset-item>
+      <a-asset-item id="room1-mtl" src="room.mtl"></a-asset-item>
     </a-assets>
 
-    <a-sky src="#skyTexture"></a-sky>
-    <!-- <a-gltf-model src="#computer" scale="1 1 1" shadow="cast: true; receive: true"></a-gltf-model> -->
-    <a-entity obj-model="obj: #comp1; mtl: #comp1-mtl" shadow="cast: true; receive: true"></a-entity>
+    <a-entity obj-model="obj: #room1; mtl: #room1-mtl" shadow="cast: true; receive: true" scale="0.3 0.3 0.3" rotation="0 180 0"></a-entity>
     <a-plane rotation="-90 0 0" height="100" width="100" color="grey" shadow="cast: true; receive: true"></a-plane>
-    <a-gltf-model src="#room" position = "-10 0 0" scale="30 30 30" shadow="cast: true; receive: true"></a-gltf-model>
-    <a-box position="0 1 -10" rotation="0 0 0" scale="2 2 2" color="red" shadow="cast: true; receive: true"></a-box>
-    <a-light type="ambient" intensity="0.1"></a-light>
+    <a-light type="ambient" intensity="0.03"></a-light>
     <a-light
-  type="point"
-  position="0.236 2.098 -0.030"
-  color="#88aaff"
-  intensity="10.0"
-  distance="5"
-  decay="2"
-  light="castShadow: true; shadowMapWidth: 1024; shadowMapHeight: 1024">
-</a-light>
+      type="point"
+      position="-0.011 2.973 -1.103"
+      color="#88aaff"
+      intensity="0.3"
+      distance="5"
+      decay="2"
+      light="castShadow: true; shadowMapWidth: 1024; shadowMapHeight: 1024; shadowCameraNear: 0.09">
+    </a-light>
+
+    <a-light
+    type="point"
+    position="0 2.973 -0.103"
+    color="#88aaff"
+    intensity="0.3"
+    distance="5"
+    decay="2"
+    light="castShadow: true; shadowMapWidth: 1024; shadowMapHeight: 1024; shadowCameraNear: 0.09">
+  </a-light>
+
     <a-light 
     type="directional"
     light="castShadow:true; shadowMapWidth:4096; shadowMapHeight:4096"
-    position="-5 10 5" 
+    position="5 8 5" 
     intensity="3.0" 
     shadow-camera-left="-10"
-    shadow-camera-right="10"
+    shadow-camera-right="-10"
     shadow-camera-top="10"
     shadow-camera-bottom="-10"
     shadow-camera-near="0.1"
     shadow-camera-far="50">
   </a-light>
 
-    <!-- Portal surface: width=2 height=3 must match portalWidth/portalHeight in component -->
+  
     <a-plane
       id="portal"
-      position="0.09 2.238 -0.057"
+      position="0.00 2.943 -1.151"
       width="2"
       height="2"
       side="double"
-      rotation="-2.64 90.922 0.000"
+      rotation="-2.671 0 0"
+      scale="0.116 0.1 0.116"
     ></a-plane>
+
+    <a-plane
+      position="1.419 2.648 -0.922"
+      width="2"
+      rotation="0 -26.94 0"
+      height="3"
+      scale="0.19 0.092 0.182"
+      material="shader: standard; color: #88aaff; emissive: #88aaff; emissiveIntensity: 1"
+      >
+    </a-plane>
+    <a-plane
+    position="1.23 3.847 -0.839"
+    width="2"
+    rotation="8.86 -36.97 0.05"
+    height="3"
+    scale="0.245 0.131 0.182"
+    material="shader: standard; color: #88aaff; emissive: #88aaff; emissiveIntensity: 1"
+    >
+    </a-plane>
+    <a-plane
+    position="0.372 3.411 -1.396"
+    width="2"
+    rotation="7.245 0 0"
+    height="3"
+    scale="0.381 0.161 0.182"
+    material="shader: standard; color: #88aaff; emissive: #88aaff; emissiveIntensity: 1"
+    >
+    </a-plane>
+    <a-plane
+    position="0.666 2.797 -1.308"
+    rotation="-18.52 -7.305 -0.018"
+    scale="0.157 0.068 0.062"
+    width="2"
+    height="3"
+    material="shader: standard; color: #88aaff; emissive: #88aaff; emissiveIntensity: 1"
+    >
+    </a-plane>
+    <a-plane position="0.41789 2.23821 -1.14428" width="2" rotation="0 -17.7055417851327 0" height="3" scale="0.14221 0.07491 0.06793" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="0.60645 2.74975 -0.99368" width="2" rotation="-10.79145 -15.66 -1.21" height="3" scale="0.03929 0.01911 0.02638" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="-0.57702 2.8189 -1.04651" width="2" rotation="-23.071130000000004 15.179290000000002 -0.07964113352318443" height="3" scale="0.03836 0.04703 0.02638" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="-0.54028 3.03331 -1.33278" width="2" rotation="-4.18524 12.137 0" height="3" scale="0.31925 0.11897 0.15718" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="0.42255 2.68822 -0.97801" width="2" rotation="-89.99963750135457 -38.075910275418856 0" height="3" scale="0.07047 0.02481 0.02452" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="-1.60204 3.41897 -1.04015" width="2" rotation="0 36.07686052820741 0" height="3" scale="0.43346 0.16814 0.15718" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="-1.59883 2.69566 -1.03841" width="2" rotation="0 25.363122717056154 0" height="3" scale="0.31643 0.14391 0.15718" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="-1.75669 2.28583 -0.41053" width="2" rotation="0 77.65468884746586 0" height="3" scale="0.21512 0.10396 0.15718" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="-0.58572 2.66622 1.22296" width="2" rotation="0 174.9921968310609 0" height="3" scale="0.21512 0.08877 0.15718" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="-0.54053 2.95139 1.45688" width="2" rotation="-12.67568 179.78239 0" height="3" scale="0.17505 0.08081 0.15718" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="-0.87143 2.83304 1.27088" width="2" rotation="-89.99963750135457 -117.23346741951288 0" height="3" scale="0.07047 0.02481 0.02452" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="0.17671 2.24844 1.21723" width="2" rotation="0 -175.49067011282472 0" height="3" scale="0.14712 0.07479 0.15718" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="0.3712 3.48066 1.34448" width="2" rotation="0 179.75003836182728 -0.61249188299485" height="3" scale="0.56114 0.23239 0.15718" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="1.28063 2.85663 0.96549" width="2" rotation="0 -140.021144847456 0" height="3" scale="0.19684 0.10337 0.15718" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
+    <a-plane position="1.30111 2.40652 0.91" width="2" rotation="0 -118.27395877547045 0" height="3" scale="0.22649 0.10643 0.13282" material="color: #88aaff; emissive: #88aaff">
+    </a-plane>
     
 
-    <!--
-      Other world — moved into portalScene by the component so it's invisible
-      in the main world. Objects are in front of exitPosition (negative Z).
-    -->
     <a-entity id="otherWorld" position="0 0 0">
-        <a-gltf-model src="#avatar" position = "-5 -3 2.5" scale="0.37 0.37 0.37" shadow="cast: true; receive: true"></a-gltf-model>
-
+        <a-gltf-model 
+          src="#avatar" 
+          position="0 0 -1"
+          scale="0.1 0.1 0.1" 
+          rotation = "0 -90 0"
+          shadow="cast: true; receive: true">
+        </a-gltf-model>
     </a-entity>
 
-    <!-- Player -->
     <a-entity
       id="player"
       camera
       look-controls
       wasd-controls="fly: true"
-      position="0 1.6 3"
+      position="0 3 0"
+      rotation="-180 -90 90"
     ></a-entity>
 
   </a-scene>
