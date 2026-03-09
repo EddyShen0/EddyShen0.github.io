@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A-Frame Portal Demo</title>
+  <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+</head>
+
+<script>
+    
+AFRAME.registerComponent('portal-system', {
+  init: function () {
+    this.el.addEventListener('loaded', () => { this._setup(); });
+  },
+
+  _setup: function () {
+    const renderer = this.el.renderer;
+    const canvas   = renderer.domElement;
+
+    const portalEl = document.querySelector('#portal');
+    if (!portalEl) { console.error('No #portal found'); return; }
+
+    const ensureMesh = () => {
+      this.portalMesh = portalEl.getObject3D('mesh');
+      if (!this.portalMesh) {
+        portalEl.addEventListener('object3dset', () => {
+          this.portalMesh = portalEl.getObject3D('mesh');
+          this._applyRenderTarget();
+        }, { once: true });
+      } else {
+        this._applyRenderTarget();
+      }
+    };
+
+    // Render target
+    this.renderTarget = new THREE.WebGLRenderTarget(
+      canvas.width  || 1024,
+      canvas.height || 1024,
+      { format: THREE.RGBAFormat }
+    );
+
+    // Portal camera — we'll override its projection matrix every frame
+    const aspect = (canvas.width || window.innerWidth) /
+                   (canvas.height || window.innerHeight);
+    this.portalCamera = new THREE.PerspectiveCamera(75, aspect, 0.01, 1000);
+
+    window.addEventListener('resize', () => {
+      const w = renderer.domElement.width;
+      const h = renderer.domElement.height;
+      this.renderTarget.setSize(w, h);
+      this.portalCamera.aspect = w / h;
+    });
+
+    // Other-world scene
+    this.portalScene = new THREE.Scene();
+    this.portalScene.background = new THREE.Color(0x111133);
+
+    const otherWorldEl = document.querySelector('#otherWorld');
+    if (otherWorldEl) {
+      this.portalScene.add(otherWorldEl.object3D);
+      this.portalScene.add(new THREE.AmbientLight(0xffffff, 0.8));
+      const dir = new THREE.DirectionalLight(0xffffff, 1.0);
+      dir.position.set(5, 10, 5);
+      this.portalScene.add(dir);
+    }
+
+    // Cache portal geometry info (world space)
+    // Portal is an <a-plane> at position="0 1.5 -5", width=2, height=3
+    // We'll recompute corners each frame from the portal entity's world matrix
+    this.portalEl     = portalEl;
+    this.portalWidth  = 2;   // must match <a-plane width>
+    this.portalHeight = 2;   // must match <a-plane height>
+
+    // The offset of the portal camera's eye in the other world.
+    // This is the "exit" position — where the camera sits when it's
+    // exactly centred on the portal. Adjust to frame your other world.
+    this.exitPosition = new THREE.Vector3(0, 1.6, 2);
+
+    // Player ref
+    this.playerEl = document.querySelector('#player');
+
+    // Reusable objects (avoid GC churn in tick)
+    this._playerWorldPos  = new THREE.Vector3();
+    this._portalWorldPos  = new THREE.Vector3();
+    this._portalQuat      = new THREE.Quaternion();
+    this._portalRight     = new THREE.Vector3();
+    this._portalUp        = new THREE.Vector3();
+    this._portalNormal    = new THREE.Vector3();
+    this._camPos          = new THREE.Vector3();
+    this._toPortal        = new THREE.Vector3();
+    this._projMatrix      = new THREE.Matrix4();
+
+    ensureMesh();
+    this._ready = true;
+  },
+
+  _applyRenderTarget: function () {
+    if (!this.portalMesh) return;
+    this.portalMesh.material = new THREE.MeshBasicMaterial({
+      map:  this.renderTarget.texture,
+      side: THREE.DoubleSide
+    });
+  },
+
+  // Oblique frustum: given the player's eye in the OTHER world (camPos),
+  // and the portal rectangle corners (also in other-world space), compute
+  // a projection matrix whose near plane IS the portal rectangle.
+  //
+  // This is the standard technique used by Source engine, Unity portals, etc.
+  // Reference: http://www.terathink.com/oblique-near-plane-clipping/
+  _buildObliqueFrustum: function (camPos, portalCenter, right, up, normal, hw, hh) {
+    // Portal corners in world (other-world) space
+    const bl = portalCenter.clone()
+      .addScaledVector(right, -hw)
+      .addScaledVector(up,    -hh);
+    const br = portalCenter.clone()
+      .addScaledVector(right,  hw)
+      .addScaledVector(up,    -hh);
+    const tl = portalCenter.clone()
+      .addScaledVector(right, -hw)
+      .addScaledVector(up,     hh);
+
+    // Vectors from eye to each corner
+    const vbl = bl.clone().sub(camPos);
+    const vbr = br.clone().sub(camPos);
+    const vtl = tl.clone().sub(camPos);
+
+    // Near plane distance = distance from eye to portal plane along normal
+    // (signed — eye must be in front of the portal for this to work)
+    const near = Math.abs(normal.dot(vbl));
+    if (near < 0.001) return null; // eye on or behind portal, skip
+
+    // Build an off-centre / oblique projection matrix.
+    // left/right/top/bottom are the frustum edges projected onto the near plane.
+    const left   = right.dot(vbl) * (this.portalCamera.near / near);
+    const rightE = right.dot(vbr) * (this.portalCamera.near / near);
+    const bottom = up.dot(vbl)    * (this.portalCamera.near / near);
+    const top    = up.dot(vtl)    * (this.portalCamera.near / near);
+
+    const proj = new THREE.Matrix4();
+    proj.makePerspective(left, rightE, top, bottom,
+                         this.portalCamera.near,
+                         this.portalCamera.far);
+    return proj;
+  },
+
+  tick: function () {
+    if (!this._ready || !this.portalMesh || !this.portalScene) return;
+
+    const renderer = this.el.renderer;
+
+    // --- 1. Get player world position ---
+    this.playerEl.object3D.getWorldPosition(this._playerWorldPos);
+
+    // --- 2. Get portal world transform ---
+    this.portalEl.object3D.getWorldPosition(this._portalWorldPos);
+    this.portalEl.object3D.getWorldQuaternion(this._portalQuat);
+
+    // Portal basis vectors in world space
+    this._portalRight .set(1,0,0).applyQuaternion(this._portalQuat).normalize();
+    this._portalUp    .set(0,1,0).applyQuaternion(this._portalQuat).normalize();
+    this._portalNormal.set(0,0,1).applyQuaternion(this._portalQuat).normalize();
+
+    // --- 3. Compute player's lateral offset from portal center ---
+    this._toPortal.subVectors(this._playerWorldPos, this._portalWorldPos);
+    const lateralRight = this._toPortal.dot(this._portalRight);
+    const lateralUp    = this._toPortal.dot(this._portalUp);
+    // depth along normal (how far in front of the portal the player is)
+    const depth        = this._toPortal.dot(this._portalNormal);
+
+    // --- 4. Portal camera position in other-world space ---
+    // Mirror the lateral offset: player left of portal → camera left of exit.
+    // Also mirror the depth so the frustum near-plane lines up with the portal.
+    this._camPos.copy(this.exitPosition)
+      .addScaledVector(this._portalRight, lateralRight)
+      .addScaledVector(this._portalUp,    lateralUp)
+      .addScaledVector(this._portalNormal, depth); // keep depth so near-plane math works
+
+    this.portalCamera.position.copy(this._camPos);
+
+    // Portal camera always looks straight through (fixed orientation)
+    // It looks in the direction the portal normal points INTO the other world
+    const lookDir = this._portalNormal.clone().negate();
+    const m = new THREE.Matrix4().lookAt(
+      this._camPos,
+      this._camPos.clone().add(lookDir),
+      this._portalUp
+    );
+    this.portalCamera.quaternion.setFromRotationMatrix(m);
+    this.portalCamera.updateMatrixWorld(true);
+
+    // --- 5. Build oblique frustum so the portal rectangle IS the view frustum ---
+    // The portal center in other-world space is simply exitPosition (no lateral offset)
+    const portalCenterOtherWorld = this.exitPosition.clone();
+
+    const proj = this._buildObliqueFrustum(
+      this._camPos,
+      portalCenterOtherWorld,
+      this._portalRight,
+      this._portalUp,
+      this._portalNormal,
+      this.portalWidth  / 2,
+      this.portalHeight / 2
+    );
+
+    if (proj) {
+      this.portalCamera.projectionMatrix.copy(proj);
+      this.portalCamera.projectionMatrixInverse.copy(proj).invert();
+    } else {
+      // Fallback: standard perspective when eye is right on the portal
+      this.portalCamera.updateProjectionMatrix();
+    }
+
+    // --- 6. Render ---
+    renderer.setRenderTarget(this.renderTarget);
+    renderer.clear();
+    renderer.render(this.portalScene, this.portalCamera);
+    renderer.setRenderTarget(null);
+  }
+});
+</script>
+
+<body>
+  <a-scene
+    portal-system
+    color-space="sRGB"
+    renderer="colorManagement: true; physicallyCorrectLights: false"
+    shadow="type: pcfsoft"
+  >
+    <a-assets>
+      <img id="skyTexture" src="image1.jpeg">
+      <a-asset-item id="room" src="EddyShen_1217_Final.glb"></a-asset-item>
+      <a-asset-item id="computer" src="computer.glb"></a-asset-item>
+      <a-asset-item id="avatar" src="avatar.glb"></a-asset-item>
+      <a-asset-item id="comp1" src="computer.obj"></a-asset-item>
+      <a-asset-item id="comp1-mtl" src="computer.mtl"></a-asset-item>
+    </a-assets>
+
+    <a-sky src="#skyTexture"></a-sky>
+    <!-- <a-gltf-model src="#computer" scale="1 1 1" shadow="cast: true; receive: true"></a-gltf-model> -->
+    <a-entity obj-model="obj: #comp1; mtl: #comp1-mtl" shadow="cast: true; receive: true"></a-entity>
+    <a-plane rotation="-90 0 0" height="100" width="100" color="grey" shadow="cast: true; receive: true"></a-plane>
+    <a-gltf-model src="#room" position = "-10 0 0" scale="30 30 30" shadow="cast: true; receive: true"></a-gltf-model>
+    <a-box position="0 1 -10" rotation="0 0 0" scale="2 2 2" color="red" shadow="cast: true; receive: true"></a-box>
+    <a-light type="ambient" intensity="0.1"></a-light>
+    <a-light
+  type="point"
+  position="0.236 2.098 -0.030"
+  color="#88aaff"
+  intensity="10.0"
+  distance="5"
+  decay="2"
+  light="castShadow: true; shadowMapWidth: 1024; shadowMapHeight: 1024">
+</a-light>
+    <a-light 
+    type="directional"
+    light="castShadow:true; shadowMapWidth:4096; shadowMapHeight:4096"
+    position="-5 10 5" 
+    intensity="3.0" 
+    shadow-camera-left="-10"
+    shadow-camera-right="10"
+    shadow-camera-top="10"
+    shadow-camera-bottom="-10"
+    shadow-camera-near="0.1"
+    shadow-camera-far="50">
+  </a-light>
+
+    <!-- Portal surface: width=2 height=3 must match portalWidth/portalHeight in component -->
+    <a-plane
+      id="portal"
+      position="0.09 2.238 -0.057"
+      width="2"
+      height="2"
+      side="double"
+      rotation="-2.64 90.922 0.000"
+    ></a-plane>
+    
+
+    <!--
+      Other world — moved into portalScene by the component so it's invisible
+      in the main world. Objects are in front of exitPosition (negative Z).
+    -->
+    <a-entity id="otherWorld" position="0 0 0">
+        <a-gltf-model src="#avatar" position = "-5 -3 2.5" scale="0.37 0.37 0.37" shadow="cast: true; receive: true"></a-gltf-model>
+
+    </a-entity>
+
+    <!-- Player -->
+    <a-entity
+      id="player"
+      camera
+      look-controls
+      wasd-controls="fly: true"
+      position="0 1.6 3"
+    ></a-entity>
+
+  </a-scene>
+</body>
+</html>
