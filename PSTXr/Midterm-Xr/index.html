@@ -79,13 +79,13 @@ AFRAME.registerComponent('portal-system', {
     });
 
     this.portalScene = new THREE.Scene();
-    this.portalScene.background = new THREE.Color(0x111133);
+    this.portalScene.background = new THREE.Color(0x88aaff);
 
     const otherWorldEl = document.querySelector('#otherWorld');
     if (otherWorldEl) {
       this.portalScene.add(otherWorldEl.object3D);
-      this.portalScene.add(new THREE.AmbientLight(0xffffff, 0.8));
-      const dir = new THREE.DirectionalLight(0xffffff, 1.0);
+      this.portalScene.add(new THREE.AmbientLight(0x88aaff, 0.8));
+      const dir = new THREE.DirectionalLight(0x88aaff, 1.0);
       dir.position.set(5, 10, 5);
       this.portalScene.add(dir);
     }
@@ -255,19 +255,18 @@ AFRAME.registerComponent('portal-system', {
               opacity: 0.99;
               value: SCREENS"
         hide-on-play="#noise">
+        <a-entity
+        position="0 -0.5 0"
+        scale="1 0.65 1"
+        text="align: center;
+              width:2;
+              wrapCount: 100;
+              color: white;
+              letter-spacing: -3.5;
+              opacity: 0.99;
+              value: Click or Tap to enable Video">
       </a-entity>
-      <a-entity
-      position="0 -0.6 -0.9"
-      scale="1 1 1"
-      text="align: center;
-            width:2;
-            wrapCount: 100;
-            color: white;
-            letter-spacing: -3.5;
-            opacity: 0.99;
-            value: Click or Tap to enable Video"
-            hide-on-play="#noise">
-    </a-entity>
+      </a-entity>
     </a-camera>
 
     <a-entity obj-model="obj: #room1; mtl: #room1-mtl" shadow="cast: true; receive: true" scale="0.3 0.3 0.3" rotation="0 180 0"></a-entity>
@@ -283,7 +282,7 @@ AFRAME.registerComponent('portal-system', {
       light="castShadow: true; shadowMapWidth: 1024; shadowMapHeight: 1024; shadowCameraNear: 0.09">
     </a-light>
 
-    <a-light
+    <!-- <a-light
     type="point"
     position="0 2.973 -0.103"
     color="#88aaff"
@@ -291,7 +290,37 @@ AFRAME.registerComponent('portal-system', {
     distance="5"
     decay="2"
     light="castShadow: true; shadowMapWidth: 1024; shadowMapHeight: 1024; shadowCameraNear: 0.09">
+  </a-light> -->
+  <a-light type="point" position="-1.76055 2.27319 -0.39373" color="#88aaff" intensity="0.1" distance="5" decay="2" light="intensity: 0.25; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
   </a-light>
+  <a-light type="point" position="-1.57948 2.63802 -1.01002" color="#88aaff" intensity="0.09" distance="5" decay="2" light="intensity: 0.5; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="0.64925 2.75091 -1.28346" color="#88aaff" intensity="0.09" distance="5" decay="2" light="decay: 1.39; distance: 0.49; castShadow: true; shadowBias: -0.04; shadowCameraNear: 0.01; shadowCameraRight: 7.82; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="0.35527 3.36397 -1.3911" color="#88aaff" intensity="0.09" distance="5" decay="2" light="decay: 1.39; distance: 0.49; castShadow: true; shadowBias: -0.04; shadowCameraNear: 0.01; shadowCameraRight: 7.82; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="1.39782 2.65976 -0.8861" color="#88aaff" intensity="0.09" distance="5" decay="2" light="decay: 1.39; distance: 0.49; intensity: 0.61; castShadow: true; shadowBias: -0.04; shadowCameraNear: 0.01; shadowCameraRight: 7.82; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="-1.57948 3.4036 -1.01002" color="#88aaff" intensity="0.09" distance="5" decay="2" light="intensity: 0.5; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="0.40384 2.26638 -1.15184" color="#88aaff" intensity="0.1" distance="5" decay="2" light="distance: 0.6; intensity: 0.25; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="0.60581 2.75625 -0.98852" color="#88aaff" intensity="0.1" distance="5" decay="2" light="distance: 0.05; intensity: 0.17; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="1.13161 3.83466 -0.78302" color="#88aaff" intensity="0.1" distance="5" decay="2" light="distance: 0.47; intensity: 0.45; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="1.2919 2.87609 0.95384" color="#88aaff" intensity="0.1" distance="5" decay="2" light="distance: 0.47; intensity: 0.45; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="1.22589 2.41944 0.86942" color="#88aaff" intensity="0.1" distance="5" decay="2" light="decay: 2.04; distance: 0.72; intensity: 0.44; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="0.18094 2.26501 1.19535" color="#88aaff" intensity="0.1" distance="5" decay="2" light="decay: 2.06; distance: 0.55; intensity: 0.16; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  
+  <a-light type="point" position="-0.56262 2.68072 1.18978" color="#88aaff" intensity="0.1" distance="5" decay="2" light="decay: 2.06; distance: 0.55; intensity: 0.27; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  <a-light type="point" position="0.18094 2.26501 1.19535" color="#88aaff" intensity="0.1" distance="5" decay="2" light="decay: 2.06; distance: 0.55; intensity: 0.16; castShadow: true; shadowCameraNear: 0.09; shadowMapHeight: 1024; shadowMapWidth: 1024">
+  </a-light>
+  
 
     <a-light 
     type="directional"
