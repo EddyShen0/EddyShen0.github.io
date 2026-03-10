@@ -4,8 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A-Frame Portal Demo</title>
+  <title>SCREENS</title>
   <script src="https://aframe.io/releases/1.7.1/aframe.min.js"></script>
+  <!-- Video playing in A-frame solution and the js code files below 
+  are from this post
+  https://stackoverflow.com/questions/71271355/a-frame-video-not-playing-only-1st-frame-visible
+  and from this example specifically:
+  https://aframe.io/aframe/examples/test/video/ -->
+  <script src="play-on-click.js"></script>
+  <script src="hide-on-play.js"></script>
+
 </head>
 
 <script>
@@ -196,6 +204,10 @@ AFRAME.registerComponent('portal-system', {
       <a-asset-item id="avatar" src="avatar.glb"></a-asset-item>
       <a-asset-item id="room1" src="room.obj"></a-asset-item>
       <a-asset-item id="room1-mtl" src="room.mtl"></a-asset-item>
+      <video id="noise" preload="auto"
+      src="noise.mp4"
+      width="160" height="90" autoplay loop="true"
+      crossOrigin="anonymous" muted></video>
     </a-assets>
 
     <a-entity obj-model="obj: #room1; mtl: #room1-mtl" shadow="cast: true; receive: true" scale="0.3 0.3 0.3" rotation="0 180 0"></a-entity>
@@ -311,6 +323,7 @@ AFRAME.registerComponent('portal-system', {
     </a-plane>
     <a-plane position="1.30111 2.40652 0.91" width="2" rotation="0 -118.27395877547045 0" height="3" scale="0.22649 0.10643 0.13282" material="color: #88aaff; emissive: #88aaff">
     </a-plane>
+    <a-video src="#noise" width="5.333" height="3" position="0 0 -20" play-on-click></a-video>
     
 
     <a-entity id="otherWorld" position="0 0 0">
@@ -322,6 +335,7 @@ AFRAME.registerComponent('portal-system', {
           shadow="cast: true; receive: true">
         </a-gltf-model>
     </a-entity>
+    
 
     <a-entity
       id="player"
@@ -332,6 +346,22 @@ AFRAME.registerComponent('portal-system', {
       rotation="-180 -90 90"
     ></a-entity>
 
+    <a-camera       
+    id="player"
+    camera
+    look-controls
+    wasd-controls="fly: true"
+    position="0 3 0">
+      <a-entity
+        position="0 0 -1.5"
+        text="align: center;
+              width: 6;
+              wrapCount: 100;
+              color: black;
+              value: Click or tap to start video"
+        hide-on-play="#noise">
+      </a-entity>
+    </a-camera>
   </a-scene>
 </body>
 </html>
