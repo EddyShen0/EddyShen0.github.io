@@ -1,0 +1,629 @@
+{
+    "scene1": [
+      {
+        "text": " "
+      },
+      {
+        "text": "..."
+      },
+      {
+        "text": "…Why is it so loud this early in the morning…"
+      },
+      {
+        "text": "Thud. Thud. Thud."
+      },
+      {
+        "text": "Father: 'Gregor? Gregor, what's the matter?'",
+        "choices": [
+          {
+            "label": "Ask if he is okay",
+            "action": "continuePlot"
+          }
+        ]
+      },
+      {
+        "text": "He hasn't left for work yet? That's strange."
+      },
+      {
+        "text": "Grete: 'Gregor? Are you alright? Are you feeling ill?'"
+      },
+      {
+        "text": "Gregor: 'I'm fine.'",
+        "choices": [
+          {
+            "label": "Ask him to open his door",
+            "action": "continuePlot"
+          }
+        ]
+      },
+      {
+        "text": "He doesn't sound fine. And he's still not out the door. This isn't good."
+      },
+      {
+        "text": "Grete: 'Gregor, please open the door. Please.'"
+      },
+      {
+        "text": "Silence.",
+        "choices": [
+          {
+            "label": "Get dressed and go to the living room",
+            "action": "goLivingRoom"
+          }
+        ]
+      },
+      {
+        "text": "Suddenly, a few knocks at the front door."
+      },
+      {
+        "text": "A man from the office. He walks straight past us toward Gregor's door as if he already owns the answer."
+      },
+      {
+        "text": "Manager: 'Mr. Samsa. Open the door, please. The company requires an explanation for your absence.'"
+      },
+      {
+        "text": "Gregor: 'I can't.'"
+      },
+      {
+        "text": "Why won't he open it? What is he hiding?"
+      },
+      {
+        "text": "Gregor is the only reason this family stays afloat. If he loses this job —"
+      },
+      {
+        "text": "What happens to us then?"
+      },
+      {
+        "text": "Hiss. Hiss. Hiss."
+      },
+      {
+        "text": "Manager: 'That — that sounds like an insect.'"
+      },
+      {
+        "text": "Mother: 'Oh God. He must be terribly ill — Grete, go, quickly — fetch a doctor, now!'",
+        "choices": [
+          {
+            "label": "Rush out and find a doctor",
+            "action": "rushOutForDoctor"
+          }
+        ]
+      },
+      {
+        "text": "Grete: 'Yes — yes, I'm going!'"
+      },
+      {
+        "text": "Huh...huh...huh.."
+      },
+      {
+        "text": "Grete: The doctor is here!"
+      },
+      {
+        "text": "No one responds."
+      },
+      {
+        "text": "Mother sits motionless in her chair, her face soaked with tears, while Father sits nearby, his head lowered, as if weighed down by something he cannot bear to face."
+      },
+      {
+        "text": "Grete: Father, where's the manager? Is Gregor okay?",
+        "choices": [
+          {
+            "label": "Check if Gregor is okay",
+            "action": "checkGregor"
+          }
+        ]
+      },
+      {
+        "text": "Father remained silent, stealing a weary, helpless glance toward Gregor's room from the corner of his eye."
+      },
+      {
+        "text": " "
+      }
+    ],
+    "scene2": [
+      {
+        "text": "..."
+      },
+      {
+        "text": "It has been a month since my brother turned into a huge insect."
+      },
+      {
+        "text": "Our lives have changed completely since then."
+      },
+      {
+        "text": "I started to take care of Gregor."
+      },
+      {
+        "text": "To keep the family afloat, father has returned to work"
+      },
+      {
+        "text": "But that wasn't enough to make up for the loss"
+      },
+      {
+        "text": "So I had to work for <span style = 'color: rgb(195, 175, 87)'>&nbsp;money&nbsp;</span> too."
+      },
+      {
+        "text": "Every day became a long day after that."
+      },
+        {
+        "text": "I have to be careful not to lose my <span style='color: rgb(90, 97, 154)'>&nbsp;sanity&nbsp;</span> due to exhaustion.",
+        "choices": [
+            {
+              "label": "Open eyes",
+              "action": "scene2Open"
+            }
+          ]
+      },
+      {
+        "text":"Oh poor brother, when will you be back?"
+      }
+    ],
+    "day1":
+    [
+        {
+            "text":"..."
+        },
+        {
+            "text":"..."
+        },
+        {
+            "text":"...",
+            "choices": [
+              { "label": "Wake up", "action": "wakeUp"}
+            ]
+        },
+        {
+            "text":"another day...",
+            "choices": [
+              { "label": "Prepare a proper meal <br> <span style='font-size: 7px; opacity: 0.5'>(-30 MONEY <br> +8 SANITY)</span>", "action": "richMeal"},
+              { "label": "Prepare something simple <br> <span style='font-size: 7px; opacity: 0.5'>(-10 MONEY <br> +5 sanity)</span>", "action": "simpleMeal","requires": { "sanity": { "gte": 0},"money":{"gte":0}} },
+              {"label": "Skip it today <br> <span style='font-size: 7px; opacity: 0.5'>(-30 SANITY)</span>", "action": "skipMeal","requires": { "money": { "gte": 0 } } }
+            ]
+        },
+        {
+        "text": "What should I prepare for Gregor?"
+      },
+      {"text":" ",
+        "choices": [
+    { 
+        "label": "Go to work... <br> <span style='font-size: 7px; opacity: 0.5'>(+50 MONEY <br> -10 sanity)</span>",
+        "action": "goWork",
+        "requires": { "sanity": { "gte": 1} }
+    },
+    { 
+        "label": "Stay home... <br> <span style='font-size: 7px; opacity: 0.5'>(+8 sanity)</span>",
+        "action": "notWork",
+        "requires": { "money": { "gte": 1 }
+    }},
+    {
+        "label": "I have no choice...",
+        "action": "notWork",
+        "requires": { "sanity": { "lte": 0 },"money": { "lte": 0 }  }
+    }
+]
+      },
+      {
+        "text":"Should I work today?"
+      },
+      {
+        "text":" ",
+        "choices": [
+            {
+                "label":"Sleep <br> <span style='font-size: 7px; opacity: 0.5'>(-50 MONEY <br> +5 sanity)</span>",
+                "action":"eventOne"
+            }
+        ]
+      },
+      {
+        "text":"That's all for today, I hope every thing gets better."        
+      }
+    ],
+    "event1":[
+        {"text": "..."},
+        {"text": "Gregor: 'You've been practicing your violin.'"},
+        {"text":"Gregor: 'You should go, you know'"},
+        {"text":"Grete: 'Go where?'"},
+        {"text":"Gregor: 'The conservatory, The one on Brünn Street. I looked into it'"},
+        {"text":"Grete: 'Gregor...'"},
+        {"text":"Gregor: 'The tuition is not so bad. And you are good enough. Better than good enough'"},
+        {"text":"Grete: 'Gregor...'"},
+        {"text":"Grete: 'But we can't afford it'"},
+        {"text":"Gregor: 'Not yet. But I've been setting aside a little. Every month'",
+        "choices":[
+            {
+                "label":"Wake Up <br> <span style='font-size: 7px; opacity: 0.5'>(+5 sanity)</span>",
+                "action":"nextDay"
+            }
+        ]},
+        {"text": "Gregor: 'Play something for me'"}
+    ],
+    "day2":[
+        {"text": "..."},
+        {"text": "..."},
+        {"text": "Was that... a dream?"},
+        {"text": "Gregor...",
+        "choices": [
+            { "label": "Wake up", "action": "wakeUp"}
+        ]},
+        {
+            "text":"another day...",
+            "choices": [
+              { "label": "Prepare a proper meal <br> <span style='font-size: 7px; opacity: 0.5'>(-30 MONEY <br> +5 SANITY)</span>", "action": "richMeal"},
+              { "label": "Prepare something simple <br> <span style='font-size: 7px; opacity: 0.5'>(-10 MONEY <br> +5 sanity)</span>", "action": "simpleMeal","requires": { "sanity": { "gte": 0},"money":{"gte":0}} },
+              {"label": "Skip it today <br> <span style='font-size: 7px; opacity: 0.5'>(-8 SANITY)</span>", "action": "skipMeal","requires": { "money": { "gte": 0 } } }
+            ]
+        },
+        {
+        "text": "What should I prepare for Gregor?"
+      },
+      {"text":" ",
+        "choices": [
+    { 
+        "label": "Go to work... <br> <span style='font-size: 7px; opacity: 0.5'>(+50 MONEY <br> -12 sanity)</span>",
+        "action": "goWork",
+        "requires": { "sanity": { "gte": 1} }
+    },
+    { 
+        "label": "Stay home... <br> <span style='font-size: 7px; opacity: 0.5'>(+8 sanity)</span>",
+        "action": "notWork",
+        "requires": { "money": { "gte": 1 }
+    }},
+    {
+        "label": "I have no choice...(stay home)",
+        "action": "notWork",
+        "requires": { "sanity": { "lte": 0 },"money": { "lte": 0 }  }
+    }
+]
+      },
+      {
+        "text":"Should I work today?"
+      },
+      {
+        "text":" ",
+        "choices": [
+            {
+                "label":"Sleep <br> <span style='font-size: 7px; opacity: 0.5'>(-50 MONEY <br> +3 sanity)</span>",
+                "action":"nextDay"
+            }
+        ]
+      },
+      {
+        "text":"Another day done. I keep telling myself things will get better."       
+      }
+    ],
+    "day3":[
+        {"text": "..."},
+        {"text": "...",
+        "choices": [
+            { "label": "Wake up", "action": "wakeUp"}
+        ]},
+        {
+            "text":"another day...",
+            "choices": [
+              { "label": "Prepare a proper meal <br> <span style='font-size: 7px; opacity: 0.5'>(-30 MONEY <br> +2 SANITY)</span>", "action": "richMeal"},
+              { "label": "Prepare something simple <br> <span style='font-size: 7px; opacity: 0.5'>(-10 MONEY <br> +3 sanity)</span>", "action": "simpleMeal","requires": { "sanity": { "gte": 0},"money":{"gte":0}} },
+              {"label": "Skip it today <br> <span style='font-size: 7px; opacity: 0.5'>(-3 SANITY)</span>", "action": "skipMeal","requires": { "sanity": { "gte": 0 } } }
+            ]
+        },
+        {
+        "text": "What should I prepare for Gregor?"
+      },
+      {"text":" ",
+        "choices": [
+    { 
+        "label": "Go to work... <br> <span style='font-size: 7px; opacity: 0.5'>(+45 MONEY <br> -14 sanity)</span>",
+        "action": "goWork",
+        "requires": { "sanity": { "gte": 1} }
+    },
+    { 
+        "label": "Stay home... <br> <span style='font-size: 7px; opacity: 0.5'>(+5 sanity)</span>",
+        "action": "notWork",
+        "requires": { "money": { "gte": 1 }
+    }},
+    {
+        "label": "I have no choice...(stay home)",
+        "action": "notWork",
+        "requires": { "sanity": { "lte": 0 },"money": { "lte": 0 }  }
+    }
+]
+      },
+      {
+        "text":"Should I work today?"
+      },
+      {
+        "text":"It's been a long day."       
+      },
+      {
+        "text":"I've noticed that Gregor has been crawling across the room all the time"
+      },
+      {
+        "text":"Perhaps it's better to clear some room for him"       
+      },
+      {
+        "text":"Grete: 'Mother! Would you help me to remove the furnitures from Gregor's room?"       
+      },
+      {
+        "text":"Mother is standing in the doorway of Gregor's room."       
+      },
+      {
+        "text":"Mother: 'We should leave the furniture as it is. It would remind him of... of when he was still—'",
+        "choices": [
+            {
+                "label": "She's right. Leave it.",
+                "action": "leaveFurniture"
+            },
+            {
+                "label": "No. Clear it out. He needs the space.",
+                "action": "removeFurniture"
+            }
+        ]       
+      },
+      {
+        "text":"Mother: 'It would be good for him. To have familiar things around.'"
+      },
+      {
+        "text":" ",
+        "choices": [
+            {
+                "label":"Sleep <br> <span style='font-size: 7px; opacity: 0.5'>(-50 MONEY <br> -2 sanity)</span>",
+                "action":"nextDay"
+            }
+        ]
+      },
+      {
+        "text": "I don't remember what I had for dinner. I don't think I ate."
+      }
+    ],
+    "day4":[
+        {"text": "..."},
+        {"text": "...",
+        "choices": [
+            { "label": "Wake up", "action": "wakeUp"}
+        ]},
+        {
+            "text":"another day...",
+            "choices": [
+              { "label": "Prepare a proper meal <br> <span style='font-size: 7px; opacity: 0.5'>(-30 MONEY <br> -3 SANITY)</span>", "action": "richMeal","requires": { "money": { "gte": 0 } }},
+              { "label": "Prepare something simple <br> <span style='font-size: 7px; opacity: 0.5'>(-10 MONEY <br> +1 sanity)</span>", "action": "simpleMeal","requires": { "sanity": { "gte": 0},"money":{"gte":0}} },
+              {"label": "Skip it today <br> <span style='font-size: 7px; opacity: 0.5'>(+0 SANITY)</span>", "action": "skipMeal","requires": { "sanity": { "gte": 0 } }}
+            ]
+        },
+        {
+        "text": "What should I prepare for Gregor?"
+      },
+      {"text":" ",
+        "choices": [
+    { 
+        "label": "Go to work... <br> <span style='font-size: 7px; opacity: 0.5'>(+40 MONEY <br> -16 sanity)</span>",
+        "action": "goWork",
+        "requires": { "sanity": { "gte": 1} }
+    },
+    { 
+        "label": "Stay home... <br> <span style='font-size: 7px; opacity: 0.5'>(+2 sanity)</span>",
+        "action": "notWork",
+        "requires": { "money": { "gte": 1 }
+    }},
+    {
+        "label": "I have no choice...(stay home)",
+        "action": "notWork",
+        "requires": { "sanity": { "lte": 0 },"money": { "lte": 0 }  }
+    }
+]
+      },
+      {
+        "text":"Should I work today?"
+      },
+      {
+        "text":" ",
+        "choices": [
+            {
+                "label":"Sleep <br> <span style='font-size: 7px; opacity: 0.5'>(-55 MONEY <br> -4 sanity)</span>",
+                "action":"nextDay"
+            }
+        ]
+      },
+      {
+        "text": "I stopped looking at his door today. I am not sure when that started."
+      }
+    ],
+    "day5":[
+        {"text": "..."},
+        {"text": "...",
+        "choices": [
+            { "label": "Wake up", "action": "wakeUp"}
+        ]},
+        {
+            "text":"another day...",
+            "choices": [
+              { "label": "Prepare a proper meal <br> <span style='font-size: 7px; opacity: 0.5'>(-30 MONEY <br> -4 SANITY)</span>", "action": "richMeal","requires": { "money": { "gte": 0 } }},
+              { "label": "Prepare something simple <br> <span style='font-size: 7px; opacity: 0.5'>(-10 MONEY <br> -3 sanity)</span>", "action": "simpleMeal","requires": { "sanity": { "gte": 0},"money":{"gte":0}} },
+              {"label": "Skip it today <br> <span style='font-size: 7px; opacity: 0.5'>(+3 SANITY)</span>", "action": "skipMeal","requires": { "sanity": { "gte": 0 } }}
+            ]
+        },
+        {
+        "text": "What should I prepare for Gregor?"
+      },
+      {"text":" ",
+        "choices": [
+    { 
+        "label": "Go to work... <br> <span style='font-size: 7px; opacity: 0.5'>(+35 MONEY <br> -18 sanity)</span>",
+        "action": "goWork",
+        "requires": { "sanity": { "gte": 1} }
+    },
+    { 
+        "label": "Stay home... <br> <span style='font-size: 7px; opacity: 0.5'>(-3 sanity)</span>",
+        "action": "notWork",
+        "requires": { "money": { "gte": 1 }
+    }},
+    {
+        "label": "I have no choice...(stay home)",
+        "action": "notWork",
+        "requires": { "sanity": { "lte": 0 },"money": { "lte": 0 }  }
+    }
+]
+      },
+      {
+        "text":"Should I work today?"
+      },
+      {
+        "text":" ",
+        "choices": [
+            {
+                "label":"Sleep <br> <span style='font-size: 7px; opacity: 0.5'>(-60 MONEY <br> -8 sanity)</span>",
+                "action":"nextDay"
+            }
+        ]
+      },
+      {
+        "text": "I am so tired. I am so tired and I do not know what I am tired of anymore."
+      }
+    ],
+    "violinScene":[
+      {
+        "text": "We were reaching our limits"
+      },
+      {
+        "text": "Father: 'There is no other way. We need the income.'"
+      },
+      {
+        "text": "We had no choice but to rent out one of our room to three lodgers"
+      },
+      {
+        "text":"We gave them the best room in the apartment."
+      },
+      {
+        "text":"Of course we did",
+        "choices": [
+            {
+                "label":"Continue",
+                "action":"violinEvent"
+            }
+        ]
+      },
+      {
+        "text":"Things has been rather stable since then, until one day"
+      },
+      {
+        "text":"It was the lodgers who asked me to play."
+      },
+      {
+        "text":"I should have said no.",
+        "choices": [
+            {
+                "label":"Start playing",
+                "action":"continuePlot"
+            }
+        ]
+      },
+      {
+        "text":"..."
+      },
+      {
+        "text":"For a few bars it seemed possible that the music might hold the room together."
+      },
+      {
+        "text":"Then I heard it."
+      },
+      {
+        "text":"That sound from the hallway."
+      },
+      {
+        "text":"That familiar dragging weight against the floorboards."
+      },
+      {
+        "text":"I didn't stop playing. I told myself I didn't hear it.",
+        "choices": [
+            {
+                "label":"Look at the hallway",
+                "action":"lookHallway"
+            }
+        ]
+      },
+      {
+        "text":"Then the lodgers rose from their chairs."
+      },
+      {
+        "text":"He was in the doorway."
+      },
+      {
+        "text":"He came out for the music. I knew it the moment I saw him."
+      },
+      {
+        "text":"Something in him heard the violin and moved toward it the way he always used to."
+      },
+      {
+        "text":"Back when he was the one who paid for my lessons.",
+        "choices": [
+            {
+                "label":"Continue",
+                "action":"decisionPrepare"
+            }
+        ]
+      },
+      {
+        "text":"Back when he used to ask me to play on Sunday evenings — anything, it doesn't matter what."
+      },
+      {
+        "text": "The lodgers left that night. All three of them."
+      },
+      {
+        "text": "I am twenty years old."
+      },
+      {
+        "text": "I have a job and calluses on my fingers and I come home each evening already emptied out."
+      },
+      {
+        "text": "Father is furious..."
+      },
+      {
+        "text": "Mother hasn't spoken."
+      },
+      {
+        "text": "I stand there in the wreckage of the evening, I feel something in my chest go very quiet."
+      },
+      {
+        "text": "I understand that I have reached the end of something..."
+      },
+      {
+        "text": "Grete: We have to get rid of it. I won't use his name."
+      },
+      {
+        "text": "She said it."
+      },
+      {
+        "text": "The words came out steadier than she expected."
+      },
+      {
+        "text": "Mother made a sound. Father looked at the floor."
+      },
+      {
+        "text": "Neither of them disagreed."
+      },
+      {
+        "text":"In the morning, he was gone."
+      },
+      {
+        "text": "The charwoman found him first. She called it matter-of-factly, the way you report a broken pipe or a dead houseplant."
+      },
+      {
+        "text": "Grete stood in the hallway and listened to her parents cry and felt something she could not name."
+      },
+      {
+        "text": "Not grief. Not relief. Something in between that had no word."
+      },
+      {
+        "text": "She thought about the conservatory on Brünn Street."
+      },
+      {
+        "text": "She had not thought about it in months."
+      },
+      {
+        "text": "She noticed, distantly, that she felt like herself again."
+      },
+      {
+        "text": "Outside, it was spring."
+      },
+      {
+        "text": "THE END"
+      }  
+    ]
+}
+
