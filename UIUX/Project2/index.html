@@ -495,6 +495,14 @@
   .color-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
   .color-row input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 50%; }
   .color-row input[type="color"]::-moz-color-swatch { border: 0; border-radius: 50%; }
+  :is(.above-label, .bottom-label):has(.generate-review) { --review-accent: #657786; background: #f5f7f9; border-left: 3px solid #c7d0d9; border-radius: 0 10px 10px 0; padding: 10px 14px; }
+  .generate-review { display: flex; align-items: flex-start; flex-direction: column; gap: 5px; }
+  .generate-check { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border: 1px solid #cbd7e1; border-radius: 18px; background: #fff; color: #32668d; font-size: 12px; font-weight: 600; }
+  .generate-check:hover { background: #edf5fb; }
+  .generate-check[aria-disabled="true"] { cursor: progress; color: #657786; }
+  .generate-review small { font-size: 10px; color: #73808b; }
+  .generate-icon { display: inline-block; width: 14px; text-align: center; }
+  @media (prefers-reduced-motion: no-preference) { .generate-icon.spinning { animation: verification-spin 900ms linear infinite; } @keyframes verification-spin { to { transform: rotate(360deg); } } }
 </style>
 </head>
 <body id="top">
@@ -755,6 +763,18 @@ const initialComments = [
         "text": "I would want to see a forecasting model before relying on that prediction."
       }
     ]
+  },
+  {
+    "id": 8,
+    "name": "Jordan Lee",
+    "avatar": "J",
+    "color": "#e8edf5",
+    "time": "1 minute ago",
+    "likes": 100,
+    "text": "HUD’s January 2024 count included 497,256 people in shelters. The total was not just people sleeping outside.",
+    "verificationStatus": "unreviewed",
+    "check": null,
+    "replies": []
   }
 ];
 
@@ -812,6 +832,16 @@ function getReview(item) {
   return item.check || {label: "Opinion", claim: item.text, why: "This statement expresses a personal preference. It is not assigned a factual truth rating."};
 }
 function renderCheck(item, key) {
+  if (item.verificationStatus === "unreviewed" || item.verificationStatus === "generating") {
+    const generating = item.verificationStatus === "generating";
+    return `<div class="generate-review">
+      <button type="button" class="generate-check" data-action="generate-check" data-check-key="${key}" aria-disabled="${generating}" aria-busy="${generating}">
+        <span class="generate-icon ${generating ? "spinning" : ""}" aria-hidden="true">${generating ? "◌" : "✦"}</span>
+        ${generating ? "Generating verification…" : "Generate verification"}
+      </button>
+      <small>Demo · Uses a prepared review of linked sources</small>
+    </div>`;
+  }
   const review = getReview(item);
   return `<div class="claim-review">
     <button class="claim-label ${review.label.toLowerCase()}" data-action="check" data-check-key="${key}" ${expansionMode === "floating" ? 'aria-haspopup="dialog"' : ""} aria-expanded="${expansionMode === "inline" ? inlineChecks.has(key) : activeCheckKey === key && claimDialog.open}" aria-controls="${expansionMode === "inline" ? `inline-${key}` : "claim-dialog"}" aria-label="${review.label}: view claim explanation">${review.label} <svg class="label-arrow" width="10" height="8" viewBox="0 0 10 8" aria-hidden="true" focusable="false"><path d="M1 2 L5 6 L9 2 Z" fill="currentColor"/></svg></button>
@@ -1252,6 +1282,30 @@ commentsEl.addEventListener("click", event => {
   const id = Number(button.closest("[data-id]").dataset.id);
   const comment = comments.find(c => c.id === id);
   const action = button.dataset.action;
+
+  if (action === "generate-check") {
+    if (comment.verificationStatus !== "unreviewed") return;
+    comment.verificationStatus = "generating";
+    const key = button.dataset.checkKey;
+    render();
+    commentsEl.querySelector(`[data-check-key="${key}"]`)?.focus({preventScroll: true});
+    toast("Preparing a source-based demo review…");
+    timers.push(setTimeout(() => {
+      const restoreFocus = document.activeElement?.dataset.checkKey === key;
+      comment.check = {
+        label: "True",
+        claim: "HUD’s January 2024 point-in-time count included 497,256 sheltered people.",
+        why: "HUD lists 497,256 sheltered people and 274,224 unsheltered people, totaling 771,480. The CRS summary reports the same breakdown. This is a single-night estimate, not a count across the entire year.",
+        sources: ["hud-ahar", "crs-homelessness"]
+      };
+      comment.verificationStatus = "reviewed";
+      render();
+      if (restoreFocus) commentsEl.querySelector(`[data-check-key="${key}"]`)?.focus({preventScroll: true});
+      log("A prepared verification was generated for Jordan Lee’s claim");
+      toast("Demo verification ready: True. Open the label to review the sources.");
+    }, 1400));
+    return;
+  }
 
   if (action === "check") {
     const key = button.dataset.checkKey;
