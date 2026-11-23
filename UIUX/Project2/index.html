@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RandomSocialMedia · Political Discussion</title>
+<style>
+  :root {
+    --bg: #f5f5f2;
+    --paper: #fff;
+    --text: #252b28;
+    --muted: #808680;
+    --line: #eceee8;
+    --accent: #39745b;
+    --soft: #edf5ef;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--text);
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  button, select { font: inherit; }
+  button { cursor: pointer; }
+  button:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+  button { -webkit-tap-highlight-color: transparent; }
+  header {
+    height: 76px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .header-inner {
+    max-width: 1120px;
+    height: 100%;
+    margin: auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand { font-size: 25px; font-weight: 800; letter-spacing: -1px; }
+  .brand span {
+    margin-left: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    color: var(--muted);
+  }
+  .live { color: var(--muted); font-size: 12px; }
+  .dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 7px;
+    background: #6c9c78;
+    border-radius: 50%;
+  }
+  main {
+    display: grid;
+    grid-template-columns: minmax(0, 740px) 260px;
+    gap: 28px;
+    max-width: 1080px;
+    margin: 36px auto 80px;
+    padding: 0 24px;
+    align-items: start;
+  }
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .post { padding: 30px; }
+  .eyebrow {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-weight: 700;
+    margin-bottom: 24px;
+  }
+  .author { display: flex; align-items: center; gap: 11px; }
+  .avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .author-name { font-weight: 650; }
+  .meta { font-size: 11px; color: var(--muted); }
+  h1 { font-size: 25px; line-height: 1.5; margin: 24px 0 14px; }
+  .post-copy { color: #5e665f; }
+  .visual {
+    background: #eaf0e6;
+    border-radius: 10px;
+    padding: 25px;
+    margin: 24px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .visual::after {
+    content: "↗";
+    position: absolute;
+    right: 22px;
+    top: 0;
+    font-size: 125px;
+    line-height: 1.2;
+    color: #d1ddca;
+  }
+  .visual small {
+    position: relative;
+    z-index: 1;
+    color: #71816b;
+    letter-spacing: 2px;
+  }
+  .visual strong {
+    display: block;
+    position: relative;
+    z-index: 1;
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+  .tag { color: var(--accent); font-size: 12px; }
+  .post-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+    margin-top: 22px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .plain {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    padding: 4px 6px;
+    border-radius: 5px;
+  }
+  .plain:hover { background: var(--bg); color: var(--text); }
+  .plain.active { color: var(--accent); background: var(--soft); }
+  .comments-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 30px 18px;
+    border-top: 8px solid var(--bg);
+  }
+  .comments-head strong { font-size: 17px; }
+  .count { font-size: 12px; color: var(--muted); margin-left: 8px; }
+  select {
+    border: 0;
+    background: var(--bg);
+    color: #606960;
+    padding: 6px 10px;
+    border-radius: 7px;
+  }
+  .read-only {
+    margin: 0 30px 8px;
+    padding: 12px 16px;
+    background: #f7f8f5;
+    color: var(--muted);
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .comment { padding: 22px 30px; border-bottom: 1px solid var(--line); }
+  .comment:last-child { border: 0; }
+  .comment-top { display: flex; align-items: center; gap: 10px; }
+  .comment .avatar { width: 34px; height: 34px; }
+  .comment-user { flex: 1; font-size: 13px; font-weight: 650; }
+  .comment-user small {
+    display: block;
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 10px;
+  }
+  .comment-text { margin: 10px 0 12px 44px; }
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-left: 40px;
+    font-size: 12px;
+  }
+  .replies {
+    margin: 15px 0 0 44px;
+    padding: 4px 15px;
+    border-left: 2px solid #dfe8dd;
+    background: #fafbf8;
+    border-radius: 0 8px 8px 0;
+  }
+  .reply { padding: 12px 0; font-size: 12px; }
+  .reply + .reply { border-top: 1px solid var(--line); }
+  .reply strong { color: var(--accent); }
+  .reply p { margin: 5px 0 0; }
+  .hidden-text { color: var(--muted); font-size: 12px; margin-left: 44px; }
+  .new-badge {
+    color: var(--accent);
+    font-size: 10px;
+    background: var(--soft);
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-left: 6px;
+  }
+  aside { display: grid; gap: 18px; }
+  .side-card { padding: 22px; }
+  .side-card h2 { font-size: 14px; margin: 0 0 12px; }
+  .side-card p { color: var(--muted); font-size: 12px; margin: 8px 0; }
+  .scenario { font-size: 10px; letter-spacing: 2px; color: var(--accent); }
+  .stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-size: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .stat span { color: var(--muted); }
+  .reset {
+    width: 100%;
+    border: 1px solid #dce2d8;
+    padding: 10px;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--accent);
+    margin-top: 18px;
+  }
+  .reset:hover { background: var(--soft); }
+  .event {
+    font-size: 12px;
+    color: #6f796e;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .event time { display: block; font-size: 10px; color: #a0a69b; }
+  .footnote { color: #a0a69b; font-size: 11px; padding: 0 5px; }
+  .toast {
+    position: fixed;
+    bottom: 26px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #283c30;
+    color: white;
+    padding: 12px 22px;
+    border-radius: 10px;
+    box-shadow: 0 6px 25px #0002;
+    font-size: 13px;
+    z-index: 5;
+    max-width: calc(100% - 32px);
+    width: max-content;
+  }
+  [hidden] { display: none !important; }
+  @media (max-width: 850px) {
+    main { grid-template-columns: 1fr; max-width: 740px; }
+    aside { grid-template-columns: 1fr 1fr; }
+    .footnote { grid-column: 1 / -1; }
+  }
+  @media (max-width: 520px) {
+    header { height: 64px; }
+    .header-inner { padding: 0 18px; }
+    .brand { font-size: 20px; letter-spacing: -0.7px; }
+    .brand span { display: none; }
+    .live { max-width: 100px; text-align: right; font-size: 10px; }
+    main { margin-top: 16px; padding: 0 12px; gap: 16px; }
+    .post, .comment { padding: 22px 18px; }
+    .comments-head { padding: 20px 18px 16px; }
+    .read-only { margin: 0 18px 6px; }
+    h1 { font-size: 22px; }
+    aside { grid-template-columns: 1fr; }
+    .visual strong { font-size: 21px; }
+    .comments-head { gap: 10px; flex-wrap: wrap; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .fresh { animation: arrive .45s ease-out; }
+    @keyframes arrive {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  }
+
+  .claim-review { display: inline-flex; margin: 0; flex-shrink: 0; }
+  .user-line, .reply-user-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .above-label { margin: 14px 0 0 44px; padding: 12px 18px; border-left: 3px solid var(--review-accent); background: color-mix(in srgb, var(--review-accent) 5%, white); border-radius: 0 10px 10px 0; }
+  .reply .above-label { margin: 8px 0; }
+  .claim-label[aria-expanded="true"] { box-shadow: 0 0 0 3px #39745b18; }
+  .claim-label { display: inline-flex; align-items: center; gap: 8px; border: 1px solid currentColor; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 650; background: #f4f5f7; color: #50596a; }
+  .claim-label.true { background: #edf6ef; color: #24613b; }
+  .claim-label.false { background: #fff0ee; color: #a32d2d; }
+  .claim-label.misleading { background: #fff6df; color: #805600; }
+  .claim-label.unverified { background: #eef1fd; color: #485697; }
+  .check-panel { margin-top: 12px; padding: 20px; border: 1px solid #dee3e9; border-radius: 12px; background: #f8fafc; font-size: 13px; }
+  .check-panel h3 { margin: 0 0 12px; font-size: 15px; }
+  .check-panel h4 { margin: 16px 0 4px; color: #5b6370; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+  .check-panel p { margin: 4px 0; }
+  .check-panel blockquote { margin: 8px 0; padding: 10px 14px; border-left: 3px solid #a8b4c4; background: white; }
+  .check-panel a, .side-card a { color: #315f8d; text-underline-offset: 3px; }
+  .check-note { font-size: 11px; color: #727b88; margin-top: 14px !important; }
+  .reply .claim-review { margin: 0; }
+  @media (max-width: 520px) { .claim-review { margin-left: 0; } .check-panel { padding: 14px; } }
+
+  .claim-dialog { position: fixed; inset: auto; margin: 0; z-index: 10; width: min(420px, calc(100% - 32px)); max-height: none; overflow: visible; padding: 0; border: 1px solid #dce3e8; border-radius: 18px; color: var(--text); background: #fff; box-shadow: 0 12px 40px #14223826; }
+  .claim-dialog::before { content: ""; position: absolute; width: 12px; height: 12px; left: calc(var(--anchor-x, 30px) - 6px); top: -7px; background: white; border-top: 1px solid #dce3e8; border-left: 1px solid #dce3e8; transform: rotate(45deg); }
+  .dialog-scroll { max-height: var(--panel-height, 60dvh); overflow-y: auto; overscroll-behavior: contain; border-radius: 18px; }
+
+  .dialog-header { position: sticky; top: 0; z-index: 1; background: #fff; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 24px; border-bottom: 1px solid var(--line); }
+  .dialog-header small { color: var(--muted); letter-spacing: 1.5px; font-size: 10px; }
+  .dialog-header h2 { margin: 2px 0 0; font-size: 19px; }
+  .dialog-close { border: 1px solid #dde3e7; border-radius: 8px; padding: 6px 12px; background: #fff; color: #414b54; }
+  .claim-dialog .check-panel { margin: 0; padding: 24px; border: 0; border-radius: 0; background: #fff; font-size: 14px; }
+  .claim-dialog .check-panel h4 { margin-top: 22px; }
+  .claim-dialog .check-panel blockquote { background: #f4f7fa; }
+  @media (max-width: 520px) { .dialog-header, .claim-dialog .check-panel { padding: 18px; } }
+  .plugin-controls { position: fixed; top: 12px; right: 18px; z-index: 30; display: flex; align-items: center; gap: 12px; padding: 8px 10px; background: #fff; border: 1px solid #cddbcf; border-radius: 12px; box-shadow: 0 4px 18px #203c2420; }
+  .plugin-caption { color: var(--muted); font-size: 11px; }
+  .label-position { display: flex; align-items: center; gap: 3px; padding: 4px; background: #f2f4f0; border: 1px solid #e1e6de; border-radius: 10px; font-size: 12px; }
+  .position-heading { margin: 20px 0 8px; font-size: 12px; font-weight: 650; color: #343e36; }
+  .label-position button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid transparent; border-radius: 7px; padding: 9px 12px; background: transparent; color: #647065; }
+  .label-position button::before { content: "✓"; visibility: hidden; }
+  .label-position button[aria-pressed="true"]::before { visibility: visible; }
+  .label-position button[aria-pressed="true"] { background: #285f43; color: #fff; border-color: #285f43; box-shadow: 0 1px 4px #0001; font-weight: 650; }
+  .bottom-label { margin: 0 0 12px 44px; }
+  .reply .bottom-label { margin: 10px 0 0; }
+  @media (max-width: 850px) { .plugin-caption { display: none; } }
+  @media (max-width: 520px) { header { height: auto; } .header-inner { min-height: 64px; flex-wrap: wrap; gap: 8px; padding-top: 10px; padding-bottom: 10px; } .brand { font-size: 18px; } .label-position { font-size: 11px; } .label-position button { padding: 5px 8px; } }
+  @media (max-width: 520px) {
+    .plugin-controls { top: 68px; right: 12px; padding: 6px 8px; }
+    main { margin-top: 78px; }
+  }
+  .plugin-controls { display: block; padding: 0; }
+  .plugin-controls summary { display: flex; align-items: center; gap: 9px; padding: 11px 14px; cursor: pointer; font-size: 13px; font-weight: 600; list-style: none; }
+  .plugin-controls summary::-webkit-details-marker { display: none; }
+  .plugin-controls summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 10px; }
+  .plugin-controls[open] .menu-chevron { transform: rotate(180deg); }
+  .extension-settings { position: absolute; top: calc(100% + 10px); right: 0; width: min(320px, calc(100vw - 24px)); padding: 20px; background: #fff; border: 1px solid #dce3dc; border-radius: 14px; box-shadow: 0 12px 36px #162b2424; }
+  .extension-heading { font-size: 14px; }
+  .extension-heading small { display: block; margin-left: 14px; color: var(--muted); font-size: 10px; font-weight: 400; }
+  .extension-settings p { font-size: 12px; color: #6b756d; line-height: 1.6; margin: 12px 0; }
+  .extension-settings p:last-child { margin-bottom: 0; }
+  .extension-settings .label-position { justify-content: space-between; }
+  .inline-review { overflow: hidden; margin-top: 12px; border-top: 1px solid #dce5dc; }
+  .inline-review .check-panel { margin: 0; padding: 18px 0 4px; border: 0; border-radius: 0; background: transparent; }
+  .bottom-label:has(.claim-review) { border-left: 3px solid #c8dacb; padding: 12px 18px; margin-top: 14px; background: #f6f9f5; border-radius: 0 10px 10px 0; }
+
+  @media (max-width: 520px) { .plugin-controls { padding: 0; } .bottom-label, .above-label { margin-left: 0; } }
+  .source-list { list-style: none; padding: 0; margin: 8px 0 0; }
+  .source-list li { padding: 12px 14px; background: #f1f5f2; border: 1px solid #e0e7e1; border-radius: 9px; }
+  .source-list li + li { margin-top: 8px; }
+  .source-list strong { display: block; font-size: 13px; font-weight: 650; }
+  .source-list a { display: block; margin-top: 4px; overflow-wrap: anywhere; font-size: 12px; }
+  .source-list small { display: block; margin-top: 6px; color: var(--muted); font-size: 10px; }
+  .source-count { display: inline-block; margin-left: 5px; padding: 0 5px; background: #e7eee8; color: #526d59; border-radius: 4px; letter-spacing: 0; }
+  :is(.claim-label.true, .bottom-label:has(.claim-label.true), .above-label:has(.claim-label.true), .claim-dialog[data-verdict="true"]) { --review-accent: var(--review-true, #24613b); }
+  :is(.claim-label.false, .bottom-label:has(.claim-label.false), .above-label:has(.claim-label.false), .claim-dialog[data-verdict="false"]) { --review-accent: var(--review-false, #a32d2d); }
+  :is(.claim-label.misleading, .bottom-label:has(.claim-label.misleading), .above-label:has(.claim-label.misleading), .claim-dialog[data-verdict="misleading"]) { --review-accent: var(--review-misleading, #805600); }
+  :is(.claim-label.unverified, .bottom-label:has(.claim-label.unverified), .above-label:has(.claim-label.unverified), .claim-dialog[data-verdict="unverified"]) { --review-accent: var(--review-unverified, #485697); }
+  :is(.claim-label.opinion, .bottom-label:has(.claim-label.opinion), .above-label:has(.claim-label.opinion), .claim-dialog[data-verdict="opinion"]) { --review-accent: var(--review-opinion, #50596a); }
+  .claim-label[class] { background: color-mix(in srgb, var(--review-accent, #50596a) 10%, white); color: color-mix(in srgb, var(--review-accent, #50596a) 65%, black); }
+  .claim-label[aria-expanded="true"] { box-shadow: 0 0 0 3px color-mix(in srgb, var(--review-accent) 18%, transparent); }
+  .bottom-label:has(.claim-review) { background: color-mix(in srgb, var(--review-accent) 5%, white); border-left-color: var(--review-accent); }
+  .claim-dialog { background: color-mix(in srgb, var(--review-accent) 5%, white); border-color: color-mix(in srgb, var(--review-accent) 35%, white); }
+  .claim-dialog::before { background: color-mix(in srgb, var(--review-accent) 9%, white); border-color: color-mix(in srgb, var(--review-accent) 35%, white); }
+  .claim-dialog .dialog-header { background: color-mix(in srgb, var(--review-accent) 9%, white); border-color: color-mix(in srgb, var(--review-accent) 20%, white); }
+  .claim-dialog .check-panel { background: transparent; }
+  :is(.claim-dialog, .bottom-label, .above-label) .source-list li { background: color-mix(in srgb, var(--review-accent) 8%, white); border-color: color-mix(in srgb, var(--review-accent) 20%, white); }
+  :is(.claim-dialog, .bottom-label, .above-label) .check-panel a { color: color-mix(in srgb, var(--review-accent) 65%, black); }
+  :is(.claim-dialog, .bottom-label, .above-label) .source-count { background: color-mix(in srgb, var(--review-accent) 15%, white); color: color-mix(in srgb, var(--review-accent) 65%, black); }
+  .inline-review { border-top-color: color-mix(in srgb, var(--review-accent) 25%, white); }
+  .extension-settings { max-height: calc(100dvh - 90px); overflow-y: auto; overscroll-behavior: contain; }
+  .color-settings { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 2px; }
+  .color-settings .position-heading { margin-top: 14px; }
+  .color-settings p { margin-top: 4px; }
+  .color-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; font-size: 12px; }
+  .color-row input { width: 42px; height: 28px; padding: 2px; background: #fff; border: 1px solid #d9dfda; border-radius: 6px; cursor: pointer; }
+  .color-row input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .reset-colors { margin-top: 12px; width: 100%; padding: 8px; border: 1px solid #d9dfda; border-radius: 7px; background: white; color: #46564a; font-size: 12px; }
+  @media (max-width: 520px) { .extension-settings { max-height: calc(100dvh - 132px); } }
+  .label-arrow { flex-shrink: 0; transform: rotate(0deg); transform-origin: center; }
+  .claim-label[aria-expanded="true"] .label-arrow { transform: rotate(180deg); }
+  @media (prefers-reduced-motion: no-preference) { .label-arrow { transition: transform 180ms ease; } }
+  .label-summary { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 18px; }
+  .label-summary > .claim-label { flex-shrink: 0; }
+  .check-panel .label-definition { flex: 1; min-width: 0; margin: 3px 0 0; color: color-mix(in srgb, var(--review-accent, #50596a) 65%, black); font-size: 12px; font-weight: 400; line-height: 1.6; }
+  .review-feedback { margin-top: 18px; }
+  .review-feedback > summary { display: table; margin-left: auto; padding: 5px 10px; border: 1px solid color-mix(in srgb, var(--review-accent) 25%, white); border-radius: 6px; color: color-mix(in srgb, var(--review-accent) 65%, black); font-size: 11px; cursor: pointer; list-style: none; }
+  .review-feedback > summary::-webkit-details-marker { display: none; }
+  .review-feedback > summary:hover { background: color-mix(in srgb, var(--review-accent) 8%, white); }
+  .review-feedback-form { margin-top: 12px; padding-top: 14px; border-top: 1px solid #dfe5df; }
+  .review-feedback-form label { display: block; margin-bottom: 12px; font-size: 12px; }
+  .review-feedback-form select, .review-feedback-form textarea { display: block; width: 100%; margin-top: 5px; padding: 8px; border: 1px solid #cdd6ce; border-radius: 6px; background: #fff; color: #303b33; font: inherit; }
+  .review-feedback-form textarea { resize: vertical; }
+  .check-panel .feedback-note, .check-panel .feedback-status { font-size: 11px; color: #667069; }
+  .feedback-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+  .feedback-actions button { padding: 7px 12px; border: 1px solid #cdd6ce; border-radius: 6px; background: white; color: #344c3a; font-size: 12px; }
+  .review-feedback summary:focus-visible, .review-feedback textarea:focus-visible { outline: 2px solid var(--review-accent); outline-offset: 3px; }
+  .label-visibility { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--text); font-size: 13px; font-weight: 600; }
+  .switch-track { display: flex; align-items: center; width: 36px; height: 22px; padding: 3px; border-radius: 20px; background: #a0a7a2; }
+  .switch-track > span { width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #0002; }
+  .label-visibility[aria-checked="true"] .switch-track { background: #285f43; }
+  .label-visibility[aria-checked="true"] .switch-track > span { transform: translateX(14px); }
+  @media (prefers-reduced-motion: no-preference) { .switch-track, .switch-track > span { transition: background 160ms ease, transform 160ms ease; } }
+
+  /* Social feed shell: review colors remain controlled by the extension. */
+  :root { --bg: #fff; --paper: #fff; --text: #0f1419; --muted: #657786; --line: #eff1f3; --accent: #1d9bf0; --soft: #e8f5fe; }
+  body { font-size: 15px; line-height: 1.5; }
+  a { -webkit-tap-highlight-color: transparent; }
+  .ui-icon { width: 22px; height: 22px; flex-shrink: 0; vertical-align: middle; }
+  header { height: 64px; position: sticky; top: 0; z-index: 20; border-bottom: 1px solid #e9edf0; }
+  .header-inner { max-width: 1280px; padding: 0 24px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 18px; letter-spacing: -.6px; color: var(--text); text-decoration: none; }
+  .brand span.brand-mark { display: grid; place-items: center; width: 32px; height: 32px; margin: 0; border-radius: 10px; background: #0f1419; color: white; font-size: 25px; line-height: 1; letter-spacing: -2px; font-weight: 800; }
+  .brand span.demo-badge { font-size: 9px; letter-spacing: 1px; margin: 0 0 0 5px; background: #f1f3f5; padding: 3px 6px; border-radius: 4px; color: #657786; }
+  main { max-width: 1280px; grid-template-columns: 206px minmax(0, 620px) minmax(240px, 300px); gap: 24px; margin: 0 auto; padding: 0 24px; }
+  .social-nav { position: sticky; top: 88px; display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 16px; width: fit-content; max-width: 100%; padding: 13px 14px; border: 0; border-radius: 28px; color: var(--text); background: none; font-size: 18px; text-decoration: none; text-align: left; }
+  .nav-item:hover { background: #f2f4f6; }
+  .nav-item.selected { font-weight: 750; }
+  .nav-item .ui-icon { width: 25px; height: 25px; }
+  .source-cta { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 10px; margin: 14px 0 32px; border-radius: 28px; color: #fff; background: #0f1419; text-decoration: none; font-size: 14px; font-weight: 700; }
+  .source-cta:hover { background: #283440; }
+  .viewer-profile { display: flex; align-items: center; gap: 10px; padding: 12px 6px; }
+  .viewer-profile .avatar { background: #e8eef9; color: #506992; }
+  .viewer-profile strong { display: block; font-size: 14px; }
+  .viewer-profile small, .nav-note { color: var(--muted); font-size: 11px; }
+  .nav-note { padding-left: 8px; line-height: 1.8; }
+  .feed { border-radius: 0; border-top: 0; border-bottom: 0; border-color: #e7ebee; min-height: calc(100vh - 64px); overflow: visible; }
+  .feed-heading { display: flex; align-items: center; gap: 22px; height: 70px; padding: 12px 20px; border-bottom: 1px solid var(--line); }
+  .feed-heading > a { color: var(--text); border-radius: 50%; padding: 5px; }
+  .feed-heading > a:hover { background: #eff3f4; }
+  .feed-heading strong { display: block; font-size: 20px; }
+  .feed-heading span { color: var(--muted); font-size: 11px; }
+  .feed-heading .feed-topic { margin-left: auto; color: #1d9bf0; background: #edf7fe; padding: 5px 10px; border-radius: 16px; font-weight: 600; }
+  .post { padding: 20px; scroll-margin-top: 76px; }
+  .eyebrow { display: flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: 0; color: var(--muted); margin-bottom: 16px; font-weight: 500; }
+  .eyebrow .ui-icon { width: 14px; height: 14px; }
+  .avatar, .comment .avatar { width: 40px; height: 40px; font-size: 14px; }
+  .author > .avatar { background: #172e48 !important; color: white !important; }
+  .author-name { font-weight: 750; font-size: 15px; }
+  .verified { display: inline-grid; place-items: center; background: #1d9bf0; color: white; border-radius: 50%; width: 15px; height: 15px; font-size: 11px; margin-left: 3px; }
+  .meta { font-size: 12px; }
+  h1 { font-size: 23px; line-height: 1.35; letter-spacing: -.5px; margin: 20px 0 12px; }
+  .post-copy { font-size: 14px; line-height: 1.65; color: #27333d; margin: 12px 0; }
+  .visual { background: #eaf1fa; border: 1px solid #dde7f3; padding: 24px; margin: 20px 0 16px; min-height: 218px; border-radius: 16px; }
+  .visual::after { content: ''; }
+  .visual-kicker { position: relative; z-index: 1; font-size: 9px; letter-spacing: 1.5px; font-weight: 700; color: #4c688e; }
+  .graphic-dot { display: inline-block; width: 6px; height: 6px; background: #5180c8; border-radius: 50%; margin-right: 5px; }
+  .visual strong { font-size: clamp(26px, 2.5vw, 35px); line-height: 1.15; color: #203b61; letter-spacing: -1px; font-weight: 800; margin: 20px 0 12px; }
+  .visual-caption { position: relative; z-index: 1; font-size: 11px; color: #587397; }
+  .graphic-bars { position: absolute; right: 18px; bottom: 0; display: flex; align-items: flex-end; gap: 9px; height: 170px; opacity: .45; transform: rotate(-10deg); transform-origin: bottom; }
+  .graphic-bars i { width: 24px; background: #acc3e4; height: 50%; border-radius: 5px 5px 0 0; }
+  .graphic-bars i:nth-child(2) { height: 65%; }.graphic-bars i:nth-child(3) { height: 57%; }.graphic-bars i:nth-child(4) { height: 85%; }.graphic-bars i:nth-child(5) { height: 100%; }
+  .tags { gap: 10px; margin: 12px 0; }.tag { font-size: 12px; color: #1687d1; }
+  .post-footer { padding-top: 12px; margin-top: 16px; font-size: 11px; }
+  .comments-head { border-top: 1px solid var(--line); padding: 16px 20px; }.comments-head strong { font-size: 16px; }
+  .comments-head select { background: transparent; font-size: 12px; border: 1px solid #e2e7eb; border-radius: 20px; padding: 5px 10px; }
+  #discussion, #activity { scroll-margin-top: 80px; }
+  .read-only { display: flex; gap: 10px; align-items: center; margin: 0; padding: 13px 20px; border-radius: 0; background: #f7f9fb; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .read-only-icon { color: #1d9bf0; font-size: 24px; }.read-only strong { display: block; color: #4b5c69; font-size: 12px; font-weight: 600; }.read-only div > span { display: block; font-size: 11px; }
+  .comment { padding: 18px 20px; border-bottom: 1px solid #eff1f3; }
+  .comment-top { gap: 10px; }.comment-user { min-width: 0; font-size: 14px; font-weight: 700; }.user-line { gap: 7px; }.user-handle { font-size: 11px; color: #7c8994; font-weight: 400; }.comment-user small { font-size: 10px; }
+  .comment-top > .plain { font-size: 10px; color: #82909b; }
+  .comment-text { margin: 12px 0 14px 50px; font-size: 14px; line-height: 1.65; }
+  .above-label { margin-left: 50px; padding: 10px 14px; }.bottom-label { margin-left: 50px; }.bottom-label:has(.claim-review) { padding: 10px 14px; }.reply .above-label, .reply .bottom-label { margin-left: 0; }
+  .actions { margin-left: 45px; gap: 30px; }.actions .plain { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; }.actions .ui-icon { width: 16px; height: 16px; }.actions .active { color: #e34188; background: #fff0f6; }.actions [data-action="like"].active svg { fill: currentColor; }
+  .replies { margin-left: 50px; background: #fafbfc; border-left-color: #d9e2e8; }
+  aside { padding-top: 20px; gap: 16px; }
+  .side-card { padding: 18px; border: 1px solid #e9edf0; border-radius: 16px; }
+  .side-card h2 { font-size: 18px; font-weight: 800; letter-spacing: -.4px; margin-bottom: 14px; }.side-card p { color: #71808b; line-height: 1.6; font-size: 11px; }
+  .topic-card { background: #f7f9fa; border: 0; padding: 18px 0 6px; }.topic-card h2 { padding: 0 18px; }
+  .topic-link { display: block; padding: 10px 18px 14px; text-decoration: none; color: var(--text); }.topic-link:hover { background: #edf1f3; }.topic-link small { display: block; font-size: 10px; color: #7a8791; }.topic-link strong { display: block; font-size: 13px; margin: 3px 0; }.topic-link span { font-size: 10px; color: #657786; }
+  .scenario { font-size: 9px; letter-spacing: 1.5px; color: #1d9bf0; }.stat { font-size: 11px; }.reset { border-radius: 24px; font-size: 12px; padding: 8px; color: #1d9bf0; border-color: #dce9f4; }.reset:hover { background: #edf7ff; }
+  .event { font-size: 11px; }.footnote { font-size: 10px; color: #89939b; line-height: 1.7; padding: 0 12px; }
+  .plugin-controls { top: 12px; right: max(18px, calc((100vw - 1232px) / 2)); background: #fff; border-color: #dde4e9; box-shadow: 0 2px 8px #0f141909; }.plugin-controls summary { font-size: 12px; padding: 9px 12px; }.extension-settings { box-shadow: 0 10px 36px #0f141921; }.extension-settings p { font-size: 12px; }
+  .toast { border-radius: 8px; background: #0f1419; }
+  @media (max-width: 1150px) { main { grid-template-columns: 64px minmax(0, 620px) minmax(220px, 280px); gap: 18px; }.social-nav .nav-item span, .source-cta span, .viewer-profile > div:last-child, .nav-note { display: none; }.nav-item { padding: 14px; }.source-cta { width: 50px; height: 50px; padding: 12px; }.viewer-profile { padding-left: 6px; } }
+  @media (max-width: 980px) { main { max-width: 780px; grid-template-columns: 64px minmax(0, 620px); padding: 0 16px; }aside { display: none; }.header-inner { max-width: 780px; }.brand span.demo-badge { display: none; } }
+  @media (max-width: 680px) { header { height: 58px; }.header-inner { min-height: 58px; padding: 0 14px; flex-wrap: nowrap; }.brand { font-size: 15px; gap: 7px; }.brand span.brand-mark { display: grid; width: 27px; height: 27px; font-size: 22px; }.brand span.demo-badge { display: none; }.plugin-controls { top: 10px; right: 10px; }.plugin-controls summary { padding: 8px; gap: 5px; }.plugin-controls summary > span:not(.menu-chevron) { display: none; }.plugin-controls .extension-settings { max-height: calc(100dvh - 78px); }main { display: block; padding: 0; margin: 0; }.social-nav { display: none; }.feed { border-left: 0; border-right: 0; }.feed-heading { height: 60px; padding: 10px 16px; }.post { padding: 18px 16px; }h1 { font-size: 22px; }.comment { padding: 16px; }.comment-text { margin-left: 0; }.above-label, .bottom-label { margin-left: 0; }.actions { margin-left: -4px; }.replies { margin-left: 14px; }.comments-head { padding: 14px 16px; }.read-only { padding: 12px 16px; }.visual { min-height: 210px; padding: 22px; }.graphic-bars { opacity: .3; }.user-handle { display: none; } }
+  .customization { margin-top: 18px; border-top: 1px solid var(--line); }
+  .plugin-controls .customization > summary { display: flex; justify-content: space-between; padding: 15px 0; font-size: 13px; font-weight: 650; border-radius: 0; }
+  .customization[open] > summary .customization-arrow { transform: rotate(180deg); }
+  .customization .color-settings { border-top: 0; margin-top: 0; padding-top: 0; }
+  .customization .color-settings .position-heading { margin-top: 0; }
+  .color-row input[type="color"] { appearance: none; -webkit-appearance: none; width: 30px; height: 30px; padding: 0; border: 2px solid white; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 1px #d9dfda; background: transparent; }
+  .color-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  .color-row input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 50%; }
+  .color-row input[type="color"]::-moz-color-swatch { border: 0; border-radius: 50%; }
+</style>
+</head>
+<body id="top">
+<header>
+  <div class="header-inner">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">r.</span>RandomSocialMedia<span class="demo-badge">DEMO</span></a>
+    <details class="plugin-controls" id="extension-menu">
+      <summary aria-label="Extension options">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M9 3h6v4a3 3 0 1 1 4 4h2v10h-7v-3a2 2 0 1 0-4 0v3H3v-7h3a2 2 0 1 0 0-4H3V3h6Z"/></svg>
+        <span>Extensions</span><span class="menu-chevron" aria-hidden="true">⌄</span>
+      </summary>
+      <div class="extension-settings">
+        <div class="extension-heading"><span class="dot"></span><strong>Claim checker</strong><small>Demo extension</small></div>
+        <p>Choose how claim reviews appear in your feed.</p>
+        <button type="button" class="label-visibility" id="label-visibility" role="switch" aria-checked="true" aria-label="Show labels">
+          <span>Show labels</span><span class="switch-track" aria-hidden="true"><span></span></span>
+        </button>
+        <div class="position-heading" id="position-heading">Label position</div>
+        <div class="label-position" role="group" aria-labelledby="position-heading" aria-describedby="placement-description">
+          <button type="button" data-label-position="above" aria-pressed="true">Above</button>
+          <button type="button" data-label-position="below" aria-pressed="false">Below</button>
+        </div>
+        <p id="placement-description">Above: below the name and above the comment text.</p>
+        <div class="position-heading" id="expansion-heading">Review display</div>
+        <div class="label-position" role="group" aria-labelledby="expansion-heading" aria-describedby="expansion-description">
+          <button type="button" data-expansion-mode="floating" aria-pressed="true">Floating</button>
+          <button type="button" data-expansion-mode="inline" aria-pressed="false">In-post</button>
+        </div>
+        <p id="expansion-description">Opens a separate panel anchored to the label.</p>
+        <details class="customization">
+          <summary><span>Customization</span><span class="customization-arrow" aria-hidden="true">⌄</span></summary>
+          <section class="color-settings" aria-labelledby="color-heading">
+          <div class="position-heading" id="color-heading">Review colors</div>
+          <p>Customize each label and its expanded review.</p>
+<label class="color-row" for="color-true"><span>True</span><input type="color" id="color-true" data-review-color="true" value="#24613b"></label>
+<label class="color-row" for="color-false"><span>False</span><input type="color" id="color-false" data-review-color="false" value="#a32d2d"></label>
+<label class="color-row" for="color-misleading"><span>Misleading</span><input type="color" id="color-misleading" data-review-color="misleading" value="#805600"></label>
+<label class="color-row" for="color-unverified"><span>Unverified</span><input type="color" id="color-unverified" data-review-color="unverified" value="#485697"></label>
+<label class="color-row" for="color-opinion"><span>Opinion</span><input type="color" id="color-opinion" data-review-color="opinion" value="#50596a"></label>
+          <button type="button" class="reset-colors" id="reset-colors">Reset colors</button>
+          </section>
+        </details>
+      </div>
+    </details>
+  </div>
+</header>
+
+<main>
+  <nav class="social-nav" aria-label="Main navigation">
+    <a class="nav-item selected" href="#top" aria-label="Home"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg><span>Home</span></a>
+    <a class="nav-item" href="#discussion" aria-label="Discussion"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-1 1v-9.5A8.5 8.5 0 0 1 21 11.5Z"/><path d="M8 9h8M8 13h5"/></svg><span>Discussion</span></a>
+    <a class="nav-item" href="evidence.html" aria-label="Explore sources" target="_blank" rel="noopener"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m16 8-3 5-5 3 3-5Z"/></svg><span>Explore sources</span></a>
+    <button class="nav-item" id="saved-nav" aria-label="Saved"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4Z"/></svg><span>Saved</span></button>
+    <a class="nav-item" href="#activity" aria-label="Activity"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Activity</span></a>
+    <a class="source-cta" href="evidence.html" aria-label="Source library" target="_blank" rel="noopener"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H5v18h14V8Z"/><path d="M14 3v5h5M8 12h8M8 16h6"/></svg><span>Source library</span></a>
+    <div class="viewer-profile"><div class="avatar">Y</div><div><strong>You</strong><small>Exploring as a guest</small></div></div>
+    <p class="nav-note">A social feed prototype.<br>Real sources. Simulated voices.</p>
+  </nav>
+  <section class="card feed" aria-label="Post and comments">
+    <div class="feed-heading"><a href="#top" aria-label="Back to top"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></a><div><strong>Post</strong><span>Housing & public policy</span></div><span class="feed-topic">For you</span></div>
+    <article class="post">
+      <div class="eyebrow"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-1 1v-9.5A8.5 8.5 0 0 1 21 11.5Z"/><path d="M8 9h8M8 13h5"/></svg><span>A conversation worth checking</span></div>
+      <div class="author">
+        <div class="avatar" style="background:#e6eddf;color:#607452">C</div>
+        <div>
+          <div class="author-name">Civic Watch <span class="verified" aria-label="Demo verified account">✓</span></div>
+          <div class="meta">@civicwatch · Nov 23 <span class="post-demo">· Demo account</span></div>
+        </div>
+      </div>
+
+      <h1>Housing is a political issue.<br>What do the numbers actually say?</h1>
+      <p class="post-copy">
+        Housing costs and homelessness are central to public debate. This discussion revisits U.S. Census Bureau data for 2023 and HUD estimates for January 2024.
+        Read the claims below and compare them with the original publications. These are dated examples, not a live update on current housing conditions.
+      </p>
+      <div class="visual" role="img" aria-label="U.S. housing debate: facts, context, and evidence">
+        <div class="visual-kicker"><span class="graphic-dot"></span> THE HOUSING CONVERSATION</div><strong>Same numbers.<br>Different stories.</strong><div class="visual-caption">Look closer. Check the context.</div><div class="graphic-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <p class="post-copy">Tenants, property owners, and voters see different priorities. Read the discussion and see how your interactions shape it.</p>
+      <div class="tags">
+        <span class="tag"># HousingData</span>
+        <span class="tag"># HousingPolicy</span>
+        <span class="tag"># PublicDebate</span>
+      </div>
+      <div class="post-footer">
+        <span>2,416 views · Simulated data</span>
+        <button class="plain" id="bookmark" aria-pressed="false">☆ Save post</button>
+      </div>
+    </article>
+
+    <div class="comments-head" id="discussion">
+      <div><strong>Replies</strong><span class="count" id="comment-count"></span></div>
+      <select id="sort" aria-label="Sort comments">
+        <option value="hot">Most liked</option>
+        <option value="new">Newest</option>
+      </select>
+    </div>
+    <div class="read-only"><span class="read-only-icon">✦</span><div><strong>A little context goes a long way.</strong><span>Tap a claim label to see the evidence behind it.</span></div></div>
+    <div id="comments"></div>
+  </section>
+
+  <aside>
+    <section class="card side-card topic-card">
+      <h2>In the conversation</h2>
+      <a class="topic-link" href="evidence.html#census-burden" target="_blank" rel="noopener"><small>Housing · United States</small><strong>#HousingAffordability</strong><span>Explore Census data ↗</span></a>
+      <a class="topic-link" href="evidence.html#hud-ahar" target="_blank" rel="noopener"><small>Public policy · Context matters</small><strong>#Homelessness</strong><span>Read the HUD report ↗</span></a>
+      <a class="topic-link" href="evidence.html#census-rents" target="_blank" rel="noopener"><small>Behind the numbers</small><strong>#CostOfLiving</strong><span>Understand the measure ↗</span></a>
+    </section>
+    <section class="card side-card">
+      <div class="scenario">EXTENSION CONCEPT</div>
+      <h2 style="margin-top:8px">Read beyond the label</h2>
+      <p>True: supported. False: contradicted. Misleading: missing context. Unverified: insufficient evidence. Opinion: no factual verdict.</p>
+      <div class="stat"><span>Comments liked</span><strong id="likes-stat">0</strong></div>
+      <div class="stat"><span>Threads open</span><strong id="replies-stat">0</strong></div>
+      <div class="stat"><span>Comments reported</span><strong id="reports-stat">0</strong></div>
+      <p><a href="evidence.html" target="_blank" rel="noopener">Explore the source library ↗</a></p>
+      <button class="reset" id="reset">↺ Restart experience</button>
+    </section>
+
+    <section class="card side-card" id="activity">
+      <h2>Discussion activity</h2>
+      <div id="events" aria-live="polite"></div>
+    </section>
+    <p class="footnote">People and interactions are simulated. Claims are teaching examples, including deliberately inaccurate ones. Reviews cite real publications; labels are manually prepared, not generated by a live fact-checker.<br>No actions are sent to a real social platform.</p>
+  </aside>
+</main>
+
+<div class="toast" id="toast" role="status" hidden></div>
+<dialog class="claim-dialog" id="claim-dialog" aria-modal="false" aria-labelledby="claim-dialog-title">
+  <div class="dialog-scroll">
+  <div class="dialog-header">
+    <div><small>CLAIM REVIEW · SOURCE-BASED DEMO</small><h2 id="claim-dialog-title">Claim details</h2></div>
+    <button class="dialog-close" id="close-claim" autofocus>Close ×</button>
+  </div>
+  <div id="claim-dialog-content"></div>
+  </div>
+</dialog>
+
+<script>
+/* Edit these entries to change the initial comments and replies. */
+const initialComments = [
+  {
+    "id": 1,
+    "name": "Maya R.",
+    "avatar": "M",
+    "color": "#e6edde",
+    "time": "12 minutes ago",
+    "likes": 128,
+    "text": "Nearly half of measured renter households were cost-burdened in 2023: 49.7% spent over 30% of income on housing, according to the Census Bureau.",
+    "check": {
+      "label": "True",
+      "claim": "49.7% of U.S. renter households with a calculated rent burden spent over 30% of income on housing in 2023.",
+      "why": "The Census release reports this percentage for the measured renter-household population. It does not describe all households or individual residents.",
+      "sources": [
+        "census-burden",
+        "census-bulletin"
+      ]
+    },
+    "replies": [
+      {
+        "name": "Local Reader",
+        "text": "Housing affordability should be a bigger priority."
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Daniel K.",
+    "avatar": "D",
+    "color": "#f2e7d8",
+    "time": "10 minutes ago",
+    "likes": 86,
+    "text": "HUD counted 771,480 people sleeping in unsheltered locations on one night in January 2024. All of them were outside the shelter system.",
+    "check": {
+      "label": "False",
+      "claim": "HUD counted 771,480 unsheltered people on one night in January 2024.",
+      "why": "771,480 combines sheltered and unsheltered homelessness. The unsheltered subtotal was 274,224; 497,256 people were sheltered.",
+      "sources": [
+        "hud-ahar",
+        "crs-homelessness"
+      ]
+    },
+    "replies": [
+      {
+        "name": "Local Reader",
+        "text": "I would like the discussion to distinguish shelter needs from other housing needs."
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Evidence First",
+    "avatar": "E",
+    "color": "#e1e9f0",
+    "time": "8 minutes ago",
+    "likes": 64,
+    "text": "Census says rents rose 3.8% in 2023. So every renter in the country had to pay exactly 3.8% more.",
+    "check": {
+      "label": "Misleading",
+      "claim": "Every U.S. renter paid 3.8% more rent in 2023.",
+      "why": "The 3.8% statistic concerns the inflation-adjusted national median gross rental cost, including utilities and fuels. A change in a median cannot describe every tenant’s bill.",
+      "sources": [
+        "census-rents",
+        "census-burden"
+      ]
+    },
+    "replies": [
+      {
+        "name": "Local Reader",
+        "text": "I wish headlines explained what an average or median can tell us."
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Just Passing By",
+    "avatar": "J",
+    "color": "#ece4ef",
+    "time": "6 minutes ago",
+    "likes": 19,
+    "text": "771,480 people experienced homelessness in 2024. That is the complete total for everyone who experienced it at any point during the year.",
+    "check": {
+      "label": "Misleading",
+      "claim": "771,480 is the total number of people who experienced homelessness at any time during 2024.",
+      "why": "This real number is a single-night estimate. Presenting it as a full-year count changes the measurement period and what the statistic means.",
+      "sources": [
+        "hud-ahar",
+        "crs-homelessness"
+      ]
+    },
+    "replies": [
+      {
+        "name": "Local Reader",
+        "text": "I would prefer a clearer explanation of the time period."
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Alex Chen",
+    "avatar": "A",
+    "color": "#e2edeb",
+    "time": "4 minutes ago",
+    "likes": 42,
+    "text": "The 2023 Census figures prove U.S. rents will drop 20% in 2027. I think renters can count on that.",
+    "check": {
+      "label": "Unverified",
+      "claim": "U.S. rents will fall by 20% in 2027, as proved by the 2023 Census data.",
+      "why": "These sources describe historical housing costs, not a 2027 forecast. They do not substantiate the predicted 20% drop. That lack of support does not establish the future outcome.",
+      "sources": [
+        "census-rents",
+        "census-burden"
+      ]
+    },
+    "replies": [
+      {
+        "name": "Local Reader",
+        "text": "I would want to see a forecasting model before relying on that prediction."
+      }
+    ]
+  }
+];
+
+let comments, liked, opened, reported, bookmarked, unlocked;
+let clock = 0;
+let timers = [];
+let toastTimer;
+
+const commentsEl = document.querySelector("#comments");
+const sortEl = document.querySelector("#sort");
+document.querySelector("#saved-nav").addEventListener("click", () => {
+  if (bookmarked) {
+    document.querySelector(".post").scrollIntoView({behavior: "smooth", block: "start"});
+    toast("Your saved post: Civic Watch’s housing discussion");
+  } else toast("No saved posts yet. Use Save post to add this discussion.");
+});
+
+function escapeHTML(text) {
+  return String(text).replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  }[char]));
+}
+
+function toast(message) {
+  const el = document.querySelector("#toast");
+  el.textContent = message;
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.hidden = true, 3200);
+}
+
+function log(message) {
+  const item = document.createElement("div");
+  item.className = "event";
+  const time = document.createElement("time");
+  time.textContent = clock++ === 0 ? "Joined discussion" : "Just now";
+  const text = document.createElement("span");
+  text.textContent = message;
+  item.append(time, text);
+  document.querySelector("#events").prepend(item);
+}
+
+
+const labelMeanings = {
+  True: "The identified factual claim is supported by the linked evidence.",
+  False: "The identified factual claim contradicts the linked evidence.",
+  Misleading: "The claim uses a real figure or partial fact but omits context that changes its meaning.",
+  Unverified: "The linked evidence is insufficient to establish whether this claim is true or false.",
+  Opinion: "This is a preference or value judgment, not a factual claim with a true-or-false verdict."
+};
+const sourceCatalog = {"census-burden": {"title": "U.S. Census Bureau · Renter housing costs, 2023", "url": "https://www.census.gov/newsroom/press-releases/2024/renter-households-cost-burdened-race.html", "note": "September 12, 2024 · 2023 ACS estimates", "summary": "Reports 49.7% among renter households with a calculated housing-cost burden. The denominator matters: this is not a share of all Americans."}, "census-rents": {"title": "U.S. Census Bureau · Rent and utilities in 2023", "url": "https://www.census.gov/library/stories/2024/09/acs-rent-burden.html", "note": "September 12, 2024 · 2023 ACS analysis", "summary": "Describes a 3.8% rise in inflation-adjusted median gross rental costs in 2023. This is an aggregate measure including utilities and fuels, not a uniform increase for every tenant."}, "census-bulletin": {"title": "U.S. Census Bureau · 2023 ACS release bulletin", "url": "https://content.govdelivery.com/accounts/USCENSUS/bulletins/3b55028", "note": "Official Census bulletin · Same ACS release, not independent evidence", "summary": "Companion bulletin summarizing the same Census release. Used as corroborating context, not as a separate dataset."}, "hud-ahar": {"title": "HUD · 2024 Homelessness Assessment, Part 1", "url": "https://www.huduser.gov/portal/sites/default/files/pdf/2024-AHAR-Part-1.pdf", "note": "December 2024 · January 2024 point-in-time estimate · PDF", "summary": "The 2024 count totals 771,480 people, including 497,256 sheltered and 274,224 unsheltered. It estimates homelessness on a single night, not unique people over an entire year."}, "crs-homelessness": {"title": "Congressional Research Service · Homelessness (IF12985)", "url": "https://www.congress.gov/crs-product/IF12985", "note": "May 5, 2025 version reviewed · Explains the same HUD dataset", "summary": "Explains the distinction between point-in-time counts and annual estimates. Its 2024 figures derive from HUD, so these two sources are not independent counts."}};
+const sourceTitles = Object.fromEntries(Object.entries(sourceCatalog).map(([id, source]) => [id, source.title]));
+function getReview(item) {
+  return item.check || {label: "Opinion", claim: item.text, why: "This statement expresses a personal preference. It is not assigned a factual truth rating."};
+}
+function renderCheck(item, key) {
+  const review = getReview(item);
+  return `<div class="claim-review">
+    <button class="claim-label ${review.label.toLowerCase()}" data-action="check" data-check-key="${key}" ${expansionMode === "floating" ? 'aria-haspopup="dialog"' : ""} aria-expanded="${expansionMode === "inline" ? inlineChecks.has(key) : activeCheckKey === key && claimDialog.open}" aria-controls="${expansionMode === "inline" ? `inline-${key}` : "claim-dialog"}" aria-label="${review.label}: view claim explanation">${review.label} <svg class="label-arrow" width="10" height="8" viewBox="0 0 10 8" aria-hidden="true" focusable="false"><path d="M1 2 L5 6 L9 2 Z" fill="currentColor"/></svg></button>
+  </div>${expansionMode === "inline" ? `<section class="inline-review" id="inline-${key}" aria-label="Claim review" ${inlineChecks.has(key) ? "" : "hidden"}>${inlineChecks.has(key) ? renderReviewContent(review) : ""}</section>` : ""}`;
+}
+const claimDialog = document.querySelector("#claim-dialog");
+let activeCheckKey = null;
+const inlineChecks = new Set();
+function renderReviewContent(review) {
+  const sources = [...new Set(review.sources || [])].filter(id => sourceTitles[id]);
+  return `
+    <section class="check-panel">
+      <div class="label-summary">
+        <span class="claim-label ${review.label.toLowerCase()}">${review.label}</span>
+        <p class="label-definition">${escapeHTML(labelMeanings[review.label])}</p>
+      </div>
+      <h4>${review.label === 'Opinion' ? 'Statement reviewed' : 'Claim checked'}</h4><p>${escapeHTML(review.claim)}</p>
+      <h4>Why this label?</h4><p>${escapeHTML(review.why)}</p>
+      ${sources.length ? `<h4>Source <span class="source-count">${sources.length}</span></h4>
+        <ul class="source-list">
+          ${sources.map(id => `<li>
+            <strong>${escapeHTML(sourceTitles[id])}</strong>
+            <a href="${escapeHTML(sourceCatalog[id].url)}" target="_blank" rel="noopener">${escapeHTML(sourceCatalog[id].url)} ↗</a>
+            <small>${escapeHTML(sourceCatalog[id].note)}</small>
+          </li>`).join("")}
+        </ul>` : ''}
+      <p class="check-note">Manually prepared review · Sources checked November 23, 2026. Historical data, not a live fact-check. The label assesses the claim, not the author.</p>
+      <details class="review-feedback">
+        <summary>Report error</summary>
+        <form class="review-feedback-form" data-claim="${escapeHTML(review.claim)}" data-verdict="${escapeHTML(review.label)}">
+          <label>What seems wrong?
+            <select name="reason" required>
+              <option value="incorrect-label">Incorrect label</option>
+              <option value="missing-context">Missing context</option>
+              <option value="source-issue">Source issue</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+          <label>Additional details (optional)
+            <textarea name="details" rows="3" maxlength="2000" placeholder="Tell us what should be reviewed."></textarea>
+          </label>
+          <p class="feedback-note">Demo: feedback is saved only in this browser, not sent to a review team.</p>
+          <div class="feedback-actions"><button type="submit">Save feedback</button></div>
+          <p class="feedback-status" role="status" hidden></p>
+        </form>
+      </details>
+    </section>`;
+}
+document.addEventListener("submit", event => {
+  const form = event.target.closest(".review-feedback-form");
+  if (!form) return;
+  event.preventDefault();
+  const status = form.querySelector(".feedback-status");
+  const values = new FormData(form);
+  const feedback = {
+    claim: form.dataset.claim,
+    label: form.dataset.verdict,
+    reason: values.get("reason"),
+    details: values.get("details"),
+    createdAt: new Date().toISOString()
+  };
+  try {
+    const key = "randomsocialmedia-review-feedback-v1";
+    const stored = JSON.parse(localStorage.getItem(key) || "[]");
+    const reports = Array.isArray(stored) ? stored : [];
+    reports.push(feedback);
+    localStorage.setItem(key, JSON.stringify(reports));
+    status.textContent = "Feedback saved in this browser. Thank you.";
+    form.querySelector('button[type="submit"]').disabled = true;
+  } catch {
+    status.textContent = "Could not save feedback locally. Please try again.";
+  }
+  status.hidden = false;
+});
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const motionEase = "cubic-bezier(.22, 1, .36, 1)";
+let dialogMotion;
+function revealReviewText(container) {
+  if (reducedMotion.matches) return;
+  container.querySelectorAll(".check-panel > *").forEach((element, index) => {
+    element.animate([
+      {opacity: 0, transform: "translateY(7px)"},
+      {opacity: 1, transform: "translateY(0)"}
+    ], {duration: 260, delay: 90 + index * 24, easing: motionEase, fill: "backwards"});
+  });
+}
+function closeCheck() {
+  if (!claimDialog.open) return;
+  dialogMotion?.cancel();
+  if (reducedMotion.matches) { claimDialog.close(); return; }
+  dialogMotion = claimDialog.animate([
+    {opacity: 1, clipPath: "inset(0 0 0 0 round 18px)"},
+    {opacity: 0, clipPath: "inset(0 0 100% 0 round 18px)"}
+  ], {duration: 190, easing: "ease-in", fill: "forwards"});
+  const current = dialogMotion;
+  current.finished.then(() => {
+    if (dialogMotion !== current) return;
+    claimDialog.close();
+    current.cancel();
+  }).catch(() => {});
+}
+function toggleInlineCheck(item, key, button) {
+  const panel = document.getElementById(`inline-${key}`);
+  const expanding = !inlineChecks.has(key);
+  const startHeight = panel.hidden ? 0 : panel.getBoundingClientRect().height;
+  const startMargin = panel.hidden ? 0 : parseFloat(getComputedStyle(panel).marginTop);
+  panel.getAnimations().forEach(animation => animation.cancel());
+  if (expanding) inlineChecks.add(key); else inlineChecks.delete(key);
+  button.setAttribute("aria-expanded", String(expanding));
+  if (expanding && !panel.innerHTML) panel.innerHTML = renderReviewContent(getReview(item));
+  panel.hidden = false;
+  panel.inert = !expanding;
+  const targetHeight = panel.getBoundingClientRect().height;
+  const finish = () => {
+    if (!panel.isConnected) return;
+    panel.hidden = !inlineChecks.has(key);
+    if (panel.hidden) panel.innerHTML = "";
+  };
+  if (reducedMotion.matches) { finish(); return; }
+  const animation = panel.animate([
+    {height: `${startHeight}px`, marginTop: `${startMargin}px`, opacity: 1},
+    {height: `${expanding ? targetHeight : 0}px`, marginTop: expanding ? "12px" : "0px", opacity: expanding ? 1 : 0}
+  ], {duration: expanding ? 380 : 240, easing: motionEase});
+  if (expanding) revealReviewText(panel);
+  animation.finished.then(finish).catch(() => {});
+}
+function openCheck(item, key) {
+  const review = getReview(item);
+  if (activeCheckKey === key && claimDialog.open) { closeCheck(); return; }
+  dialogMotion?.cancel();
+  activeCheckKey = key;
+  claimDialog.dataset.verdict = review.label.toLowerCase();
+  document.querySelector("#claim-dialog-title").textContent = `${review.label} · Claim details`;
+  document.querySelector("#claim-dialog-content").innerHTML = renderReviewContent(review);
+  if (!claimDialog.open) claimDialog.show();
+  claimDialog.querySelector(".dialog-scroll").scrollTop = 0;
+  positionCheck();
+  if (!reducedMotion.matches) {
+    dialogMotion = claimDialog.animate([
+      {opacity: 0, clipPath: "inset(0 0 100% 0 round 18px)", transform: "translateY(-4px)"},
+      {opacity: 1, clipPath: "inset(0 0 0 0 round 18px)", transform: "translateY(0)"}
+    ], {duration: 360, easing: motionEase});
+    revealReviewText(claimDialog);
+  }
+}
+function positionCheck() {
+  if (!claimDialog.open) return;
+  const anchor = commentsEl.querySelector(`[data-check-key="${activeCheckKey}"]`);
+  if (!anchor || !anchor.getClientRects().length) { claimDialog.close(); return; }
+  commentsEl.querySelectorAll('[data-action="check"]').forEach(button => button.setAttribute("aria-expanded", String(button === anchor)));
+  const rect = anchor.getBoundingClientRect();
+  // Keep the panel rendered as its anchor scrolls away; the viewport clips it naturally.
+  const gap = 10, margin = 12;
+  const width = claimDialog.offsetWidth;
+  const left = Math.max(margin, Math.min(rect.left, innerWidth - width - margin));
+  // Always extend downward from the label; never flip while scrolling.
+  claimDialog.style.setProperty("--panel-height", `${Math.min(560, innerHeight * .7)}px`);
+  claimDialog.style.setProperty("--anchor-x", `${Math.max(18, Math.min(width - 18, rect.left + rect.width / 2 - left))}px`);
+  claimDialog.style.setProperty("--origin-y", "0%");
+  claimDialog.style.left = `${left}px`;
+  claimDialog.style.top = `${rect.bottom + gap}px`;
+}
+let anchorFrame = 0;
+function scheduleCheckPosition() {
+  if (!claimDialog.open || anchorFrame) return;
+  anchorFrame = requestAnimationFrame(() => { anchorFrame = 0; positionCheck(); });
+}
+window.addEventListener("scroll", scheduleCheckPosition, {passive: true, capture: true});
+window.addEventListener("resize", scheduleCheckPosition);
+document.querySelector("#close-claim").addEventListener("click", closeCheck);
+// Keep the page interactive while the independent review window is open.
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && claimDialog.open) {
+    event.preventDefault();
+    closeCheck();
+  }
+});
+claimDialog.addEventListener("close", () => {
+  dialogMotion?.cancel();
+  commentsEl.querySelector(`[data-check-key="${activeCheckKey}"]`)?.focus({preventScroll: true});
+  activeCheckKey = null;
+  commentsEl.querySelectorAll('[data-action="check"]').forEach(button => button.setAttribute("aria-expanded", "false"));
+});
+
+const defaultReviewColors = {"true": "#24613b", "false": "#a32d2d", "misleading": "#805600", "unverified": "#485697", "opinion": "#50596a"};
+const reviewColorStorageKey = "randomsocialmedia-review-colors-v1";
+let reviewColors = {...defaultReviewColors};
+try {
+  const saved = JSON.parse(localStorage.getItem(reviewColorStorageKey) || "{}");
+  for (const key of Object.keys(defaultReviewColors)) {
+    if (/^#[0-9a-f]{6}$/i.test(saved?.[key])) reviewColors[key] = saved[key];
+  }
+} catch { /* Local preferences are optional when storage is unavailable. */ }
+function applyReviewColors() {
+  for (const [key, color] of Object.entries(reviewColors)) {
+    document.documentElement.style.setProperty(`--review-${key}`, color);
+    document.querySelector(`[data-review-color="${key}"]`).value = color;
+  }
+}
+function saveReviewColors() {
+  try { localStorage.setItem(reviewColorStorageKey, JSON.stringify(reviewColors)); } catch {}
+}
+document.querySelectorAll("[data-review-color]").forEach(input => {
+  input.addEventListener("input", () => {
+    reviewColors[input.dataset.reviewColor] = input.value;
+    applyReviewColors();
+    saveReviewColors();
+  });
+});
+document.querySelector("#reset-colors").addEventListener("click", () => {
+  reviewColors = {...defaultReviewColors};
+  applyReviewColors();
+  saveReviewColors();
+});
+applyReviewColors();
+const extensionMenu = document.querySelector("#extension-menu");
+document.addEventListener("click", event => {
+  if (!extensionMenu.contains(event.target)) extensionMenu.open = false;
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && extensionMenu.open) {
+    extensionMenu.open = false;
+    extensionMenu.querySelector("summary").focus();
+  }
+});
+let labelPosition = "above";
+let expansionMode = "floating";
+document.querySelectorAll("[data-expansion-mode]").forEach(button => {
+  button.addEventListener("click", () => {
+    if (expansionMode === button.dataset.expansionMode) return;
+    if (claimDialog.open) claimDialog.close();
+    inlineChecks.clear();
+    expansionMode = button.dataset.expansionMode;
+    document.querySelectorAll("[data-expansion-mode]").forEach(option => {
+      option.setAttribute("aria-pressed", String(option.dataset.expansionMode === expansionMode));
+    });
+    document.querySelector("#expansion-description").textContent = expansionMode === "floating"
+      ? "Opens a separate panel anchored to the label."
+      : "Expands within the comment, directly beneath the label.";
+    render();
+  });
+});
+let labelsVisible = true;
+document.querySelector("#label-visibility").addEventListener("click", event => {
+  labelsVisible = !labelsVisible;
+  event.currentTarget.setAttribute("aria-checked", String(labelsVisible));
+  if (!labelsVisible) {
+    if (claimDialog.open) claimDialog.close();
+    inlineChecks.clear();
+  }
+  render();
+});
+document.querySelectorAll("[data-label-position]").forEach(button => {
+  button.addEventListener("click", () => {
+    if (labelPosition === button.dataset.labelPosition) return;
+    if (claimDialog.open) claimDialog.close();
+    inlineChecks.clear();
+    labelPosition = button.dataset.labelPosition;
+    document.querySelector("#placement-description").textContent = labelPosition === "above"
+      ? "Above: below the name and above the comment text."
+      : "Below: under the comment text.";
+    document.querySelectorAll("[data-label-position]").forEach(option => {
+      option.setAttribute("aria-pressed", String(option.dataset.labelPosition === labelPosition));
+    });
+    render();
+    positionCheck();
+  });
+});
+
+function render() {
+  const sorted = [...comments].sort((a, b) =>
+    sortEl.value === "new"
+      ? b.id - a.id
+      : (b.likes + Number(liked.has(b.id))) -
+        (a.likes + Number(liked.has(a.id)))
+  );
+
+  commentsEl.innerHTML = sorted.map(c => {
+    const isLiked = liked.has(c.id);
+    const isOpen = opened.has(c.id);
+    const isReported = reported.has(c.id);
+    return `
+      <article class="comment ${c.fresh ? "fresh" : ""}" data-id="${c.id}">
+        <div class="comment-top">
+          <div class="avatar" style="background:${c.color}">${escapeHTML(c.avatar)}</div>
+          <div class="comment-user">
+            <div class="user-line"><span>${escapeHTML(c.name)}</span><span class="user-handle">@${escapeHTML(c.name.toLowerCase().replace(/[^a-z0-9]/g, ""))}</span>
+            ${c.fresh ? '<span class="new-badge">New</span>' : ""}</div>
+            <small>${escapeHTML(c.time)}</small>
+          </div>
+          <button class="plain" data-action="report"
+            aria-label="Report comment by ${escapeHTML(c.name)}"
+            ${isReported ? "disabled" : ""}>
+            ${isReported ? "Reported" : "Report"}
+          </button>
+        </div>
+
+        ${labelsVisible && !isReported && labelPosition === "above" ? `<div class="above-label">${renderCheck(c, `comment-${c.id}`)}</div>` : ""}
+
+        ${isReported
+          ? '<p class="hidden-text">This comment is hidden for this session.</p>'
+          : `<p class="comment-text">${escapeHTML(c.text)}</p>`}
+
+        ${labelsVisible && !isReported && labelPosition === "below" ? `<div class="bottom-label">${renderCheck(c, `comment-${c.id}`)}</div>` : ""}
+
+        <div class="actions">
+          ${!isReported ? `
+            <button class="plain ${isLiked ? "active" : ""}"
+              data-action="like" aria-label="${isLiked ? 'Unlike' : 'Like'} comment by ${escapeHTML(c.name)}" aria-pressed="${isLiked}">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg> ${c.likes + Number(isLiked)}
+            </button>
+            <button class="plain" data-action="replies"
+              aria-expanded="${isOpen}" aria-controls="replies-${c.id}">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-1 1v-9.5A8.5 8.5 0 0 1 21 11.5Z"/><path d="M8 9h8M8 13h5"/></svg> ${isOpen ? "Hide replies" : `Replies · ${c.replies.length}`}
+            </button>` : `
+            <button class="plain" data-action="restore">Restore comment</button>`}
+        </div>
+
+        ${!isReported ? `
+          <div class="replies" id="replies-${c.id}" ${isOpen ? "" : "hidden"}>
+            ${c.replies.map((r, replyIndex) => `
+              <div class="reply">
+                <div class="reply-user-line"><strong>${escapeHTML(r.name)}</strong></div>
+                ${labelsVisible && labelPosition === "above" ? `<div class="above-label">${renderCheck(r, `reply-${c.id}-${replyIndex}`)}</div>` : ""}
+                <p>${escapeHTML(r.text)}</p>
+                ${labelsVisible && labelPosition === "below" ? `<div class="bottom-label">${renderCheck(r, `reply-${c.id}-${replyIndex}`)}</div>` : ""}
+              </div>`).join("")}
+          </div>` : ""}
+      </article>`;
+  }).join("");
+
+  const total = comments.reduce((n, c) => n + 1 + c.replies.length, 0);
+  document.querySelector("#comment-count").textContent = total;
+  document.querySelector("#likes-stat").textContent = liked.size;
+  document.querySelector("#replies-stat").textContent = opened.size;
+  document.querySelector("#reports-stat").textContent = reported.size;
+  scheduleCheckPosition();
+}
+
+function addComment(comment) {
+  if (comments.some(c => c.id === comment.id)) return;
+  comments.push({ ...comment, fresh: true, time: "Just now" });
+  render();
+  log(`${comment.name} joined the discussion`);
+  toast("A new comment has been added");
+}
+
+/* The first like triggers a scripted response related to that comment. */
+function triggerReaction(id) {
+  if (unlocked.has("reaction")) return;
+  unlocked.add("reaction");
+
+  const reactions = {
+  "1": {
+    "name": "Longtime Tenant",
+    "avatar": "L",
+    "color": "#e6edde",
+    "text": "49.7% of U.S. renter households with a calculated rent burden spent over 30% of income on housing in 2023.",
+    "check": {
+      "label": "True",
+      "claim": "49.7% of U.S. renter households with a calculated rent burden spent over 30% of income on housing in 2023.",
+      "why": "The Census release reports this percentage for the measured renter-household population. It does not describe all households or individual residents.",
+      "sources": [
+        "census-burden",
+        "census-bulletin"
+      ]
+    }
+  },
+  "2": {
+    "name": "Council Observer",
+    "avatar": "C",
+    "color": "#f2e7d8",
+    "text": "The unsheltered count was 274,224; the larger number includes people in shelters.",
+    "check": {
+      "label": "True",
+      "claim": "The 2024 HUD count included 274,224 unsheltered people.",
+      "why": "This is the unsheltered subtotal, rather than the combined count.",
+      "sources": [
+        "hud-ahar",
+        "crs-homelessness"
+      ]
+    }
+  },
+  "3": {
+    "name": "Budget Reader",
+    "avatar": "B",
+    "color": "#e1e9f0",
+    "text": "The measure is real median gross rental cost, not each renter’s individual increase.",
+    "check": {
+      "label": "True",
+      "claim": "The reported 3.8% change is in real median gross rental costs.",
+      "why": "The Census measure includes rent, utilities, and fuels and adjusts for inflation.",
+      "sources": [
+        "census-rents",
+        "census-burden"
+      ]
+    }
+  },
+  "4": {
+    "name": "Housing Researcher",
+    "avatar": "H",
+    "color": "#ece4ef",
+    "text": "The figure describes one night in January, not everyone who experienced homelessness that year.",
+    "check": {
+      "label": "True",
+      "claim": "The 2024 figure is a point-in-time estimate.",
+      "why": "HUD and CRS identify the observation period as one night in January.",
+      "sources": [
+        "hud-ahar",
+        "crs-homelessness"
+      ]
+    }
+  },
+  "5": {
+    "name": "Policy Student",
+    "avatar": "P",
+    "color": "#e2edeb",
+    "text": "I would ask for a forecast model before making plans around a 20% rent drop.",
+    "check": {
+      "label": "Opinion",
+      "claim": "I would ask for a forecast model before making plans around a 20% rent drop.",
+      "why": "This expresses a preference about evidence, not a factual forecast.",
+      "sources": []
+    }
+  }
+};
+  const reaction = reactions[id];
+  if (reaction) {
+    timers.push(setTimeout(() => addComment({
+      id: 6, likes: 0, replies: [], ...reaction
+    }), 2200));
+  }
+}
+
+commentsEl.addEventListener("click", event => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) return;
+  const id = Number(button.closest("[data-id]").dataset.id);
+  const comment = comments.find(c => c.id === id);
+  const action = button.dataset.action;
+
+  if (action === "check") {
+    const key = button.dataset.checkKey;
+    const item = key.startsWith("reply-") ? comment.replies[Number(key.split("-")[2])] : comment;
+    if (expansionMode === "inline") {
+      toggleInlineCheck(item, key, button);
+    } else {
+      openCheck(item, key);
+    }
+    return;
+  }
+
+  if (action === "like") {
+    if (liked.has(id)) {
+      liked.delete(id);
+    } else {
+      liked.add(id);
+      if (id <= 5) triggerReaction(id);
+    }
+    render();
+  }
+
+  if (action === "replies") {
+    if (opened.has(id)) {
+      opened.delete(id);
+    } else {
+      opened.add(id);
+    }
+    render();
+    // Preserve keyboard focus after toggling replies.
+    commentsEl.querySelector(`[data-id="${id}"] [data-action="replies"]`)?.focus();
+  }
+
+  if (action === "report") {
+    if (!window.confirm("Report and hide this comment in the simulation?")) return;
+    reported.add(id);
+    opened.delete(id);
+    log(`You reported a comment by ${comment.name}`);
+    toast("Simulated report recorded. Comment hidden.");
+    render();
+  }
+
+  if (action === "restore") {
+    reported.delete(id);
+    render();
+    toast("Comment restored");
+  }
+});
+
+sortEl.addEventListener("change", render);
+
+document.querySelector("#bookmark").addEventListener("click", () => {
+  bookmarked = !bookmarked;
+  const button = document.querySelector("#bookmark");
+  button.textContent = bookmarked ? "★ Saved" : "☆ Save post";
+  button.classList.toggle("active", bookmarked);
+  button.setAttribute("aria-pressed", String(bookmarked));
+  toast(bookmarked ? "Post saved for this session" : "Post removed from saved items");
+});
+
+function reset() {
+  inlineChecks.clear();
+  timers.forEach(clearTimeout);
+  timers = [];
+  clearTimeout(toastTimer);
+  document.querySelector("#toast").hidden = true;
+
+  comments = JSON.parse(JSON.stringify(initialComments));
+  liked = new Set();
+  opened = new Set();
+  if (claimDialog.open) claimDialog.close();
+  reported = new Set();
+  unlocked = new Set();
+  bookmarked = false;
+  clock = 0;
+  sortEl.value = "hot";
+
+  const bookmark = document.querySelector("#bookmark");
+  bookmark.textContent = "☆ Save post";
+  bookmark.classList.remove("active");
+  bookmark.setAttribute("aria-pressed", "false");
+  document.querySelector("#events").innerHTML = "";
+
+  log("You joined the discussion about U.S. housing data");
+  render();
+
+  // The discussion continues even without user interaction.
+  timers.push(setTimeout(() => addComment({
+  "id": 7,
+  "name": "Data Reader",
+  "avatar": "D",
+  "color": "#ede9df",
+  "likes": 3,
+  "text": "I would like people to open the source before sharing a number. The year and the definition matter to me.",
+  "replies": [
+    {
+      "name": "Civic Watch",
+      "text": "I would like that too. Showing the original source makes the discussion easier to follow."
+    }
+  ]
+}), 18000));
+}
+
+document.querySelector("#reset").addEventListener("click", () => {
+  reset();
+  toast("Experience restarted");
+});
+
+reset();
+</script>
+</body>
+</html>
